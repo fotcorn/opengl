@@ -53,36 +53,57 @@ int main() {
     glEnable(GL_DEPTH_TEST); // enable depth testing
     glDepthFunc(GL_LESS); // smaller value is closer
 
+    GLuint vertexAttributeObject = 0;
+    glGenVertexArrays(1, &vertexAttributeObject); // one attribute
+    glBindVertexArray(vertexAttributeObject);
+
+    // vertex positions
     GLfloat points[] = {
          0.0f,  0.5f, 0.0f,
          0.5f, -0.5f, 0.0f,
         -0.5f, -0.5f, 0.0f,
     };
-
-    GLuint vertexBufferObject = 0;
-    glGenBuffers(1, &vertexBufferObject);  // one buffer in this vertex buffer object
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject); // set current buffer
+    GLuint vertexPositions = 0;
+    glGenBuffers(1, &vertexPositions);  // one buffer in this vertex buffer object
+    glBindBuffer(GL_ARRAY_BUFFER, vertexPositions); // set current buffer
     glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW); // copy data to GPU memory
 
-    GLuint vertexAttributeObject = 0;
-    glGenVertexArrays(1, &vertexAttributeObject); // one attribute
-    glBindVertexArray(vertexAttributeObject);
     glEnableVertexAttribArray(0); // activate first attribute
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexPositions);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+    // vertex colors
+    GLfloat colors[] = {
+        1.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 1.0f,
+    };
+
+    GLuint vertexColors = 0;
+    glGenBuffers(1, &vertexColors);  // one buffer in this vertex buffer object
+    glBindBuffer(GL_ARRAY_BUFFER, vertexColors); // set current buffer
+    glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW); // copy data to GPU memory
+
+    glEnableVertexAttribArray(1); // activate first attribute
+    glBindBuffer(GL_ARRAY_BUFFER, vertexColors);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
     const char* vertexShaderSource =
     "#version 410\n"
-    "in vec3 vertexPosition;\n"
+    "in vec3 vertex_position;\n"
+    "in vec3 vertex_color;\n"
+    "out vec3 color;\n"
     "void main() {\n"
-    "  gl_Position = vec4(vertexPosition, 1.0);\n"
+    "  color = vertex_color;\n"
+    "  gl_Position = vec4(vertex_position, 1.0);\n"
     "}\n";
 
     const char* fragmentShaderSource =
     "#version 410\n"
+    "in vec3 color;"
     "out vec4 fragmentColor;\n"
     "void main() {\n"
-    "  fragmentColor = vec4(0.5, 0.0, 0.0, 1.0);\n"
+    "  fragmentColor = vec4(color, 1.0);\n"
     "}\n";
 
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -99,6 +120,7 @@ int main() {
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
     glCompileShader(fragmentShader);
+
     glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &params);
     if (params != GL_TRUE) {
         printShaderError(fragmentShader);
@@ -109,6 +131,8 @@ int main() {
     GLuint shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragmentShader);
+    glBindAttribLocation(shaderProgram, 0, "vertex_position");
+    glBindAttribLocation(shaderProgram, 1, "vertex_color");
     glLinkProgram(shaderProgram);
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &params);
     if (params != GL_TRUE) {
