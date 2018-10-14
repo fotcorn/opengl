@@ -5,7 +5,11 @@
 #include <iostream>
 using namespace std;
 
+#include "shader.h"
+#include "shader_program.h"
 
+#include <fmt/format.h>
+using namespace fmt;
 
 void errorCallback(int error, const char* message) {
     cerr << "GLFW error:" << message << endl;
@@ -26,6 +30,30 @@ void printProgramError(GLuint shader) {
     glGetProgramInfoLog(shader, maxLength, &length, log);
     cerr << "Program info: " << log << endl;
 }
+
+outcome::result<ShaderProgram, std::string> loadShaders() {
+    auto fragmentShader = Shader::loadFromFile("shaders/fragment.glsl", Shader::Type::Fragment);
+    if (!fragmentShader) {
+        return format("Failed to load fragment shader: {}", fragmentShader.error());
+    }
+    auto vertexShader = Shader::loadFromFile("shaders/vertex.glsl", Shader::Type::Vertex);
+    if (!vertexShader) {
+        return format("Failed to load vertex shader: {}", vertexShader.error());
+    }
+
+    ShaderProgram program;
+    program.attachShader(vertexShader.value());
+    program.attachShader(fragmentShader.value());
+    program.setAttribLocation("vertex_position", 0);
+    program.setAttribLocation("vertex_color", 1);
+
+    auto linkOK = program.link();
+    if (!linkOK) {
+        return linkOK.error();
+    }
+    return program;
+}
+
 
 int main() {
     glfwSetErrorCallback(errorCallback);
@@ -88,62 +116,16 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, vertexColors);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-    const char* vertexShaderSource =
-    "#version 410\n"
-    "in vec3 vertex_position;\n"
-    "in vec3 vertex_color;\n"
-    "out vec3 color;\n"
-    "void main() {\n"
-    "  color = vertex_color;\n"
-    "  gl_Position = vec4(vertex_position, 1.0);\n"
-    "}\n";
-
-    const char* fragmentShaderSource =
-    "#version 410\n"
-    "in vec3 color;"
-    "out vec4 fragmentColor;\n"
-    "void main() {\n"
-    "  fragmentColor = vec4(color, 1.0);\n"
-    "}\n";
-
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
-    glCompileShader(vertexShader);
-    int params = -1;
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &params);
-    if (params != GL_TRUE) {
-        printShaderError(vertexShader);
-        cerr << "vertex shader failed to compile" << endl;
+    auto shaderProgramResult = loadShaders();
+    if (!shaderProgramResult) {
+        cerr << shaderProgramResult.error();
         return 1;
     }
-
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
-    glCompileShader(fragmentShader);
-
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &params);
-    if (params != GL_TRUE) {
-        printShaderError(fragmentShader);
-        cerr << "fragment shader failed to compile" << endl;
-        return 1;
-    }
-
-    GLuint shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glBindAttribLocation(shaderProgram, 0, "vertex_position");
-    glBindAttribLocation(shaderProgram, 1, "vertex_color");
-    glLinkProgram(shaderProgram);
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &params);
-    if (params != GL_TRUE) {
-        printProgramError(shaderProgram);
-        cerr << "failed to link shader" << endl;
-        return 1;
-    }
+    ShaderProgram program = shaderProgramResult.value();
 
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glUseProgram(shaderProgram);
+        program.use();
         glBindVertexArray(vertexAttributeObject);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         glfwPollEvents();
