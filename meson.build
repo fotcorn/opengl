@@ -4,7 +4,7 @@ opengl = dependency('GL')
 glew = dependency('glew')
 glfw = dependency('glfw3')
 
-src = ['src/main.cpp', 'src/shader.cpp', 'src/shader_program.cpp', 'lib/fmt/src/format.cc']
+src = ['src/main.cpp', 'src/shader.cpp', 'src/shader_program.cpp', 'src/object.cpp', 'lib/fmt/src/format.cc']
 
 incdir = include_directories('lib/fmt/include')
 
