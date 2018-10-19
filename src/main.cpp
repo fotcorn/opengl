@@ -5,12 +5,15 @@
 #include <iostream>
 using namespace std;
 
-#include "shader.h"
-#include "shader_program.h"
-#include "object.h"
+#include <glm/mat4x4.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include <fmt/format.h>
 using namespace fmt;
+
+#include "shader.h"
+#include "shader_program.h"
+#include "object.h"
 
 void errorCallback(int error, const char* message) {
     cerr << "GLFW error:" << message << endl;
@@ -92,15 +95,21 @@ int main() {
         0.0f, 0.0f, 1.0f,
     });
 
-    Object object2({
-       1.0f,  0.5f, 0.0f,
-       1.5f, -0.5f, 0.0f,
-       0.5f, -0.5f, 0.0f,
-    }, {
-        1.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 1.0f,
-    });
+
+
+    // model to world space
+    glm::mat4 model;
+    model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+    // world space to camera space
+    glm::mat4 view;
+    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+    // camera space to projection/2D space
+    glm::mat4 projection;
+    projection = glm::perspective(glm::radians(45.0f), 1024.0f / 800.0f, 0.1f, 100.0f);
+
+    glm::mat4 mvp = projection * view * model;
 
     auto shaderProgramResult = loadShaders();
     if (!shaderProgramResult) {
@@ -108,12 +117,12 @@ int main() {
         return 1;
     }
     ShaderProgram program = shaderProgramResult.value();
+    program.setUniform("mvp", projection);
 
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         program.use();
         object1.draw();
-        object2.draw();
         glfwPollEvents();
         glfwSwapBuffers(window);
     }
