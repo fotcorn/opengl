@@ -110,17 +110,11 @@ int main() {
 
     // model to world space
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-
-    // world space to camera space
-    glm::mat4 view = glm::mat4(1.0f);
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+    model = glm::rotate(model, glm::radians(-30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
     // camera space to projection/2D space
     glm::mat4 projection = glm::mat4(1.0f);
     projection = glm::perspective(glm::radians(45.0f), 1024.0f / 800.0f, 0.1f, 100.0f);
-
-    glm::mat4 mvp = projection * view * model;
 
     auto shaderProgramResult = loadShaders();
     if (!shaderProgramResult) {
@@ -130,6 +124,17 @@ int main() {
     ShaderProgram program = shaderProgramResult.value();
 
     while (!glfwWindowShouldClose(window)) {
+        // world space to camera space
+        // rotate around origin
+        float radius = 5.0f;
+        float cameraX = sin(glfwGetTime()) * radius;
+        float cameraZ = cos(glfwGetTime()) * radius;
+        glm::mat4 view;
+        view = glm::lookAt(glm::vec3(cameraX, 0.0, cameraZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+
+        // full camera matrix
+        glm::mat4 mvp = projection * view * model;
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         program.use();
         program.setUniform("mvp", mvp);
