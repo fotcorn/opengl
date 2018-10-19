@@ -35,6 +35,12 @@ void printProgramError(GLuint shader) {
     cerr << "Program info: " << log << endl;
 }
 
+void errorCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,const GLchar* message, const void* userParam) {
+  fprintf( stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+           ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ),
+            type, severity, message );
+}
+
 outcome::result<ShaderProgram, std::string> loadShaders() {
     auto fragmentShader = Shader::loadFromFile("shaders/fragment.glsl", Shader::Type::Fragment);
     if (!fragmentShader) {
@@ -81,6 +87,9 @@ int main() {
     glfwMakeContextCurrent(window);
     glewExperimental = GL_TRUE;
     glewInit();
+
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(errorCallback, 0);
 
     glEnable(GL_DEPTH_TEST); // enable depth testing
     glDepthFunc(GL_LESS); // smaller value is closer
