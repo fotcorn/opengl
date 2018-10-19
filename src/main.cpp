@@ -64,6 +64,8 @@ outcome::result<ShaderProgram, std::string> loadShaders() {
     return program;
 }
 
+const int WINDOW_WIDTH = 1280;
+const int WINDOW_HEIGHT = 800;
 
 int main() {
     glfwSetErrorCallback(errorCallback);
@@ -77,7 +79,8 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(1024, 800, "Hello World", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Hello World", nullptr, nullptr);
+
     if (!window) {
         cerr << "Failed to create GLFW window" << endl;
         glfwTerminate();
@@ -93,9 +96,10 @@ int main() {
 
     glEnable(GL_DEPTH_TEST); // enable depth testing
     glDepthFunc(GL_LESS); // smaller value is closer
+    glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
     Object object1({
-        0.0f,  0.5f, 0.0f,
+        0.5f,  0.5f, 0.0f,
         0.5f, -0.5f, 0.0f,
         -0.5f, -0.5f, 0.0f,
     }, {
@@ -104,18 +108,16 @@ int main() {
         0.0f, 0.0f, 1.0f,
     });
 
-
-
     // model to world space
-    glm::mat4 model;
+    glm::mat4 model = glm::mat4(1.0f);
     model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
     // world space to camera space
-    glm::mat4 view;
+    glm::mat4 view = glm::mat4(1.0f);
     view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 
     // camera space to projection/2D space
-    glm::mat4 projection;
+    glm::mat4 projection = glm::mat4(1.0f);
     projection = glm::perspective(glm::radians(45.0f), 1024.0f / 800.0f, 0.1f, 100.0f);
 
     glm::mat4 mvp = projection * view * model;
@@ -126,11 +128,11 @@ int main() {
         return 1;
     }
     ShaderProgram program = shaderProgramResult.value();
-    program.setUniform("mvp", projection);
 
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         program.use();
+        program.setUniform("mvp", mvp);
         object1.draw();
         glfwPollEvents();
         glfwSwapBuffers(window);
