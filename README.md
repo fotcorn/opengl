@@ -1,11 +1,7 @@
 # Dependencies
-Install the following build dependencies
-* meson
-* ninja
+Install the following tools:
 * conan
-
-Easiest way is using pip with Python3: `pip install meson ninja conan`.
-On Linux, use sudo and pip3: `sudo pip3 install meson ninja conan`
+* cmake
 
 # Setup and build
 ```
@@ -13,6 +9,8 @@ mkdir build
 cd build
 conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
 conan install ..
-conan build ..
-ninja
+cmake ..
+cmake --build .
 ```
+
+For Windows, use `cmake .. -G "Visual Studio 15 2017 Win64"` instead of `cmake ..`.
