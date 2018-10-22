@@ -8,4 +8,6 @@ conan_basic_setup()
 include_directories(lib/fmt/include)
 
 add_executable(opengl src/main.cpp src/shader.cpp src/shader_program.cpp src/object.cpp lib/fmt/src/format.cc)
+add_executable(model src/model.cpp)
 target_link_libraries(opengl ${CONAN_LIBS})
+target_link_libraries(model ${CONAN_LIBS})
