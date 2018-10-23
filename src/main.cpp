@@ -12,7 +12,8 @@ using namespace fmt;
 
 #include "shader.h"
 #include "shader_program.h"
-#include "object.h"
+// #include "object.h"
+#include "model.h"
 
 void errorCallback(int error, const char* message) {
     cerr << "GLFW error:" << message << endl;
@@ -54,7 +55,7 @@ outcome::result<ShaderProgram, std::string> loadShaders() {
     program.attachShader(vertexShader.value());
     program.attachShader(fragmentShader.value());
     program.setAttribLocation("vertex_position", 0);
-    program.setAttribLocation("vertex_color", 1);
+    // program.setAttribLocation("vertex_color", 1);
 
     auto linkOK = program.link();
     if (!linkOK) {
@@ -97,7 +98,7 @@ int main() {
     glDepthFunc(GL_LESS); // smaller value is closer
     glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    Object object1({
+    /*Object object1({
         0.5f,  0.5f, 0.0f,
         0.5f, -0.5f, 0.0f,
         -0.5f, -0.5f, 0.0f,
@@ -105,7 +106,14 @@ int main() {
         1.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f,
         0.0f, 0.0f, 1.0f,
-    });
+    });*/
+
+    auto modelLoadResult = Model::loadFromFile("model/Corvette-F3.obj");
+    if (!modelLoadResult) {
+        cerr << modelLoadResult.error();
+        return 1;
+    }
+    Model spaceShip = modelLoadResult.value();
 
     // model to world space
     glm::mat4 model = glm::mat4(1.0f);
@@ -137,7 +145,9 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         program.use();
         program.setUniform("mvp", mvp);
-        object1.draw();
+        spaceShip.draw();
+        // object1.draw();
+
         glfwPollEvents();
         glfwSwapBuffers(window);
     }
