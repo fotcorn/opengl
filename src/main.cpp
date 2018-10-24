@@ -55,7 +55,7 @@ outcome::result<ShaderProgram, std::string> loadShaders() {
     program.attachShader(vertexShader.value());
     program.attachShader(fragmentShader.value());
     program.setAttribLocation("vertex_position", 0);
-    // program.setAttribLocation("vertex_color", 1);
+    program.setAttribLocation("texture_coordinate", 1);
 
     auto linkOK = program.link();
     if (!linkOK) {
@@ -114,6 +114,15 @@ int main() {
         return 1;
     }
     Model spaceShip = modelLoadResult.value();
+
+    auto textureLoadResult = Texture::loadFromFile("model/SF_Corvette-F3_diffuse.jpg");
+    if (!textureLoadResult) {
+        cerr << textureLoadResult.error();
+        return 1;
+    }
+    auto texture = textureLoadResult.value();
+
+    spaceShip.addTexture(texture);
 
     // model to world space
     glm::mat4 model = glm::mat4(1.0f);

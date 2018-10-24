@@ -1,9 +1,11 @@
 #version 410
 
-//in vec3 color;
+in vec2 frag_texture_coordinate;
+
 out vec4 fragmentColor;
 
+uniform sampler2D model_texture;
+
 void main() {
-  //fragmentColor = vec4(color, 1.0);
-  fragmentColor = vec4(1.0, 0.0, 0.0, 1.0);
+  fragmentColor = texture(model_texture, frag_texture_coordinate);
 }

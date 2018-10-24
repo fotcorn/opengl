@@ -1,12 +1,13 @@
 #version 410
 
 in vec3 vertex_position;
-// in vec3 vertex_color;
+in vec2 texture_coordinate;
+
+out vec2 frag_texture_coordinate;
+
 uniform mat4 mvp;
 
-//out vec3 color;
-
 void main() {
-  // color = vertex_color;
+  frag_texture_coordinate = texture_coordinate;
   gl_Position = mvp * vec4(vertex_position, 1.0);
 }

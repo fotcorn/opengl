@@ -22,6 +22,10 @@ outcome::result<Model, std::string> Model::loadFromFile(std::string path) {
         vertex.position.x = mesh->mVertices[i].x;
         vertex.position.y = mesh->mVertices[i].y;
         vertex.position.z = mesh->mVertices[i].z;
+
+        vertex.texturePosition.x = mesh->mTextureCoords[0][i].x; 
+        vertex.texturePosition.y = mesh->mTextureCoords[0][i].y;
+
         model.vertices.push_back(vertex);
     }
 
@@ -50,10 +54,19 @@ outcome::result<Model, std::string> Model::loadFromFile(std::string path) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model.ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * model.indices.size(), &model.indices[0], GL_STATIC_DRAW);
 
+    // load texture coordinates
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texturePosition));
+
     return model;
 }
 
+void Model::addTexture(Texture texture) {
+    this->textures.push_back(texture);
+}
+
 void Model::draw() {
+    this->textures[0].bind();
     glBindVertexArray(this->vao);
     glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
 }
