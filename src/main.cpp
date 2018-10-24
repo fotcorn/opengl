@@ -118,6 +118,7 @@ int main() {
     // model to world space
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::rotate(model, glm::radians(-30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::scale(model, glm::vec3(0.001, 0.001, 0.001));
 
     // camera space to projection/2D space
     glm::mat4 projection = glm::mat4(1.0f);

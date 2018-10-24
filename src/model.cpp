@@ -54,6 +54,6 @@ outcome::result<Model, std::string> Model::loadFromFile(std::string path) {
 }
 
 void Model::draw() {
-    // glBindVertexArray(this->model.vao);
-    // glDrawArrays(GL_TRIANGLES, 0, 3);
+    glBindVertexArray(this->vao);
+    glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
 }
