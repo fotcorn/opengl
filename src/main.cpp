@@ -15,27 +15,11 @@ using namespace fmt;
 // #include "object.h"
 #include "model.h"
 
-void errorCallback(int error, const char* message) {
+void glfwErrorCallback(int error, const char* message) {
     cerr << "GLFW error:" << message << endl;
 }
 
-void printShaderError(GLuint shader) {
-    int maxLength = 2048;
-    int length = 0;
-    char log[2048];
-    glGetShaderInfoLog(shader, maxLength, &length, log);
-    cerr << "Shader info: " << log << endl;
-}
-
-void printProgramError(GLuint shader) {
-    int maxLength = 2048;
-    int length = 0;
-    char log[2048];
-    glGetProgramInfoLog(shader, maxLength, &length, log);
-    cerr << "Program info: " << log << endl;
-}
-
-void errorCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,const GLchar* message, const void* userParam) {
+void openglErrorCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,const GLchar* message, const void* userParam) {
   fprintf( stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
            ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ),
             type, severity, message );
@@ -68,7 +52,7 @@ const int WINDOW_WIDTH = 1280;
 const int WINDOW_HEIGHT = 800;
 
 int main() {
-    glfwSetErrorCallback(errorCallback);
+    glfwSetErrorCallback(glfwErrorCallback);
 
     if (!glfwInit()) {
         cerr << "Failed to initialize GLFW3" << endl;
@@ -92,7 +76,7 @@ int main() {
     glewInit();
 
     glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(errorCallback, 0);
+    glDebugMessageCallback(openglErrorCallback, 0);
 
     glEnable(GL_DEPTH_TEST); // enable depth testing
     glDepthFunc(GL_LESS); // smaller value is closer
