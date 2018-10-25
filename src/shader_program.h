@@ -8,7 +8,7 @@
 
 #include <glm/mat4x4.hpp>
 
-#include "../lib/outcome.hpp"
+#include <outcome/outcome.hpp>
 namespace outcome = OUTCOME_V2_NAMESPACE;
 
 class ShaderProgram {

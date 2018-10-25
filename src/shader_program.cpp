@@ -5,7 +5,7 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-#include "../lib/outcome.hpp"
+#include <outcome/outcome.hpp>
 namespace outcome = OUTCOME_V2_NAMESPACE;
 
 ShaderProgram::ShaderProgram() {
