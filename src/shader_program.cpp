@@ -1,6 +1,7 @@
 #include "shader_program.h"
 
 #include <string>
+#include <vector>
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -24,11 +25,11 @@ outcome::result<void, std::string> ShaderProgram::link() {
     int params = -1;
     glGetProgramiv(this->handle, GL_LINK_STATUS, &params);
     if (params != GL_TRUE) {
-        int maxLength = 2048;
-        int length = 0;
-        char log[2048];
-        glGetProgramInfoLog(this->handle, maxLength, &length, log);
-        return std::string(log, length);
+        GLint logLength;
+        glGetProgramiv(this->handle, GL_INFO_LOG_LENGTH, &logLength);
+        std::vector<char> error(logLength);
+        glGetProgramInfoLog(this->handle, logLength, nullptr, &error[0]);
+        return std::string(error.begin(), error.end());
     }
     return outcome::success();
 }

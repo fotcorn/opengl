@@ -7,7 +7,7 @@ using namespace fmt;
 
 #include <sstream>
 #include <fstream>
-using namespace std;
+#include <string>
 
 Shader::Shader() {}
 
@@ -21,7 +21,7 @@ outcome::result<Shader, std::string> Shader::loadFromFile(std::string path, Type
         return std::string("Unknown shader type");
     }
 
-    ifstream in(path.c_str(), ios::in);
+    std::ifstream in(path.c_str(), std::ios::in);
     if (!in) {
         return format("Failed to read shader file {}", path);
     }
@@ -34,11 +34,11 @@ outcome::result<Shader, std::string> Shader::loadFromFile(std::string path, Type
     int params = -1;
     glGetShaderiv(shader.handle, GL_COMPILE_STATUS, &params);
     if (params != GL_TRUE) {
-        int maxLength = 2048;
-        int length = 0;
-        char log[2048];
-        glGetShaderInfoLog(shader.handle, maxLength, &length, log);
-        return std::string(log, length);
+        GLint logLength;
+        glGetShaderiv(shader.handle, GL_INFO_LOG_LENGTH, &logLength);
+        std::vector<char> error(logLength);
+        glGetShaderInfoLog(shader.handle, logLength, nullptr, &error[0]);
+        return std::string(error.begin(), error.end());
     }
     return shader;
 }
