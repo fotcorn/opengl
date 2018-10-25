@@ -1,8 +1,8 @@
 #ifndef SHADER_PROGRAM_H
 #define SHADER_PROGRAM_H
 
-#include <string>
 #include "shader.h"
+#include <string>
 
 #include <GL/glew.h>
 
@@ -19,6 +19,7 @@ public:
     void setUniform(std::string uniform, glm::mat4 data);
     outcome::result<void, std::string> link();
     void use();
+
 private:
     GLuint handle;
 };

@@ -1,8 +1,8 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include "vertex.h"
 #include "texture.h"
+#include "vertex.h"
 
 #include <string>
 #include <vector>
@@ -17,8 +17,10 @@ public:
     static outcome::result<Model, std::string> loadFromFile(std::string path);
     void addTexture(Texture texture);
     void draw();
+
 private:
-    Model () {}
+    Model() {
+    }
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
     std::vector<Texture> textures;

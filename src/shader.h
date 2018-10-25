@@ -10,9 +10,11 @@ namespace outcome = OUTCOME_V2_NAMESPACE;
 
 class Shader {
     friend class ShaderProgram;
+
 private:
     Shader();
     GLuint handle;
+
 public:
     enum class Type { Vertex, Fragment };
     static outcome::result<Shader, std::string> loadFromFile(std::string path, Type shaderType);

@@ -16,7 +16,7 @@ void ShaderProgram::attachShader(Shader shader) {
     glAttachShader(this->handle, shader.handle);
 }
 
-void ShaderProgram::setAttribLocation(std::string attribute, unsigned int location)  {
+void ShaderProgram::setAttribLocation(std::string attribute, unsigned int location) {
     glBindAttribLocation(this->handle, location, attribute.c_str());
 }
 
@@ -35,7 +35,7 @@ outcome::result<void, std::string> ShaderProgram::link() {
 }
 
 void ShaderProgram::use() {
-     glUseProgram(this->handle);
+    glUseProgram(this->handle);
 }
 
 void ShaderProgram::setUniform(std::string uniform, glm::mat4 data) {

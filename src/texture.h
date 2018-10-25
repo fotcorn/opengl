@@ -10,9 +10,10 @@ namespace outcome = OUTCOME_V2_NAMESPACE;
 
 class Texture {
 public:
-    static outcome::result<Texture, std::string>  loadFromFile(std::string path);
+    static outcome::result<Texture, std::string> loadFromFile(std::string path);
 
     void bind();
+
 private:
     GLuint handle;
 };

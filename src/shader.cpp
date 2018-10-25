@@ -5,11 +5,12 @@
 #include <fmt/format.h>
 using namespace fmt;
 
-#include <sstream>
 #include <fstream>
+#include <sstream>
 #include <string>
 
-Shader::Shader() {}
+Shader::Shader() {
+}
 
 outcome::result<Shader, std::string> Shader::loadFromFile(std::string path, Type shaderType) {
     Shader shader;
