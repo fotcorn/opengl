@@ -8,6 +8,7 @@ using namespace fmt;
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 outcome::result<Shader, std::string> Shader::loadFromFile(const std::string& path, Type shaderType) {
     Shader shader;
