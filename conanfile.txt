@@ -4,6 +4,7 @@ glfw/3.2.1@bincrafters/stable
 glm/0.9.9.1@g-truc/stable
 Assimp/4.1.0@jacmoe/stable
 stb/20180214@conan/stable
+fmt/5.2.1@bincrafters/stable
 
 [generators]
 cmake
