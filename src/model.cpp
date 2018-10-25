@@ -7,7 +7,7 @@
 #include <fmt/format.h>
 using namespace fmt;
 
-outcome::result<Model, std::string> Model::loadFromFile(std::string path) {
+outcome::result<Model, std::string> Model::loadFromFile(const std::string& path) {
     Model model;
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(path.c_str(), aiProcess_Triangulate | aiProcess_FlipUVs);
@@ -48,7 +48,7 @@ outcome::result<Model, std::string> Model::loadFromFile(std::string path) {
 
     glEnableVertexAttribArray(0); // activate first attribute
     glBindBuffer(GL_ARRAY_BUFFER, model.vbo);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), nullptr);
 
     // load vertex incides
     glGenBuffers(1, &model.ebo);
@@ -70,5 +70,5 @@ void Model::addTexture(Texture texture) {
 void Model::draw() {
     this->textures[0].bind();
     glBindVertexArray(this->vao);
-    glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, nullptr);
 }

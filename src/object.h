@@ -5,7 +5,7 @@
 #include <vector>
 
 class Object {
-    GLuint vertexAttributeObject;
+    GLuint vertexAttributeObject = 0;
 
 public:
     Object(std::vector<GLfloat> points, std::vector<GLfloat> colors);

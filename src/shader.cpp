@@ -9,10 +9,7 @@ using namespace fmt;
 #include <sstream>
 #include <string>
 
-Shader::Shader() {
-}
-
-outcome::result<Shader, std::string> Shader::loadFromFile(std::string path, Type shaderType) {
+outcome::result<Shader, std::string> Shader::loadFromFile(const std::string& path, Type shaderType) {
     Shader shader;
     if (shaderType == Type::Fragment) {
         shader.handle = glCreateShader(GL_FRAGMENT_SHADER);

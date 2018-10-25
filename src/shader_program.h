@@ -15,8 +15,8 @@ class ShaderProgram {
 public:
     ShaderProgram();
     void attachShader(Shader shader);
-    void setAttribLocation(std::string attribute, unsigned int location);
-    void setUniform(std::string uniform, glm::mat4 data);
+    void setAttribLocation(const std::string& attribute, unsigned int location);
+    void setUniform(const std::string& uniform, glm::mat4 data);
     outcome::result<void, std::string> link();
     void use();
 

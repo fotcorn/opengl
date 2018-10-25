@@ -15,11 +15,12 @@ using namespace fmt;
 // #include "object.h"
 #include "model.h"
 
-void glfwErrorCallback(int, const char* message) {
+void glfwErrorCallback(int /*unused*/, const char* message) {
     cerr << "GLFW error:" << message << endl;
 }
 
-void openglErrorCallback(GLenum, GLenum type, GLuint, GLenum severity, GLsizei, const GLchar* message, const void*) {
+void openglErrorCallback(GLenum /*unused*/, GLenum type, GLuint /*unused*/, GLenum severity, GLsizei /*unused*/,
+                         const GLchar* message, const void* /*unused*/) {
     fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
             (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
 }
@@ -75,7 +76,7 @@ int main() {
     glewInit();
 
     glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(openglErrorCallback, 0);
+    glDebugMessageCallback(openglErrorCallback, nullptr);
 
     glEnable(GL_DEPTH_TEST); // enable depth testing
     glDepthFunc(GL_LESS); // smaller value is closer

@@ -12,12 +12,12 @@ class Shader {
     friend class ShaderProgram;
 
 private:
-    Shader();
-    GLuint handle;
+    Shader() = default;
+    GLuint handle = 0;
 
 public:
     enum class Type { Vertex, Fragment };
-    static outcome::result<Shader, std::string> loadFromFile(std::string path, Type shaderType);
+    static outcome::result<Shader, std::string> loadFromFile(const std::string& path, Type shaderType);
 };
 
 #endif

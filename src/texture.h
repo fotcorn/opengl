@@ -10,12 +10,13 @@ namespace outcome = OUTCOME_V2_NAMESPACE;
 
 class Texture {
 public:
-    static outcome::result<Texture, std::string> loadFromFile(std::string path);
+    static outcome::result<Texture, std::string> loadFromFile(const std::string& path);
 
     void bind();
 
 private:
-    GLuint handle;
+    Texture() = default;
+    GLuint handle = 0;
 };
 
 #endif // !TEXTURE_H

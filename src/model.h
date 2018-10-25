@@ -14,7 +14,7 @@ namespace outcome = OUTCOME_V2_NAMESPACE;
 
 class Model {
 public:
-    static outcome::result<Model, std::string> loadFromFile(std::string path);
+    static outcome::result<Model, std::string> loadFromFile(const std::string& path);
     void addTexture(Texture texture);
     void draw();
 

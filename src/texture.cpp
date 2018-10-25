@@ -6,7 +6,7 @@
 #include <fmt/format.h>
 using namespace fmt;
 
-outcome::result<Texture, std::string> Texture::loadFromFile(std::string path) {
+outcome::result<Texture, std::string> Texture::loadFromFile(const std::string& path) {
     Texture texture;
 
     int width, height, nrChannels;
