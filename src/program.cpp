@@ -178,11 +178,7 @@ void Program::initCamera() {
 
 void Program::mainLoop() {
     bool wireframe = false;
-
-    float cameraX = 3.0f;
-    float cameraY = 5.0f;
-    float cameraZ = -4.0f;
-
+    glm::vec3 cameraPosition = glm::vec3(3.0, 5.0, -4.0);
     glm::vec3 lightPosition = glm::vec3(-15.0, 15.0, 5.0);
 
     float lastFrame = 0.0f;
@@ -222,7 +218,7 @@ void Program::mainLoop() {
 
         // world space to camera space
         glm::mat4 view;
-        view = glm::lookAt(glm::vec3(cameraX, cameraY, cameraZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+        view = glm::lookAt(cameraPosition, glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 
         // draw space ship
         glm::mat4 mvp = this->projectionMatrix * view * this->spaceShipModelMatrix;
@@ -244,9 +240,9 @@ void Program::mainLoop() {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         ImGui::Checkbox("Wireframe", &wireframe);
-        ImGui::SliderFloat("Camera X", &cameraX, -10.0f, 10.0f);
-        ImGui::SliderFloat("Camera Y", &cameraY, -10.0f, 10.0f);
-        ImGui::SliderFloat("Camera Z", &cameraZ, -10.0f, 10.0f);
+        ImGui::SliderFloat("Camera X", &cameraPosition.x, -10.0f, 10.0f);
+        ImGui::SliderFloat("Camera Y", &cameraPosition.y, -10.0f, 10.0f);
+        ImGui::SliderFloat("Camera Z", &cameraPosition.z, -10.0f, 10.0f);
 
         ImGui::SliderFloat("Light X", &lightPosition.x, -100.0f, 100.0f);
         ImGui::SliderFloat("Light Y", &lightPosition.y, -100.0f, 100.0f);
