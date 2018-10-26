@@ -1,12 +1,10 @@
 #include "shader_program.h"
 
+#include <stdexcept>
 #include <string>
 #include <vector>
 
 #include <glm/gtc/type_ptr.hpp>
-
-#include <outcome/outcome.hpp>
-namespace outcome = OUTCOME_V2_NAMESPACE;
 
 ShaderProgram::ShaderProgram() {
     this->handle = glCreateProgram();
@@ -20,7 +18,7 @@ void ShaderProgram::setAttribLocation(const std::string& attribute, unsigned int
     glBindAttribLocation(this->handle, location, attribute.c_str());
 }
 
-outcome::result<void, std::string> ShaderProgram::link() {
+void ShaderProgram::link() {
     glLinkProgram(this->handle);
     int params = -1;
     glGetProgramiv(this->handle, GL_LINK_STATUS, &params);
@@ -29,9 +27,8 @@ outcome::result<void, std::string> ShaderProgram::link() {
         glGetProgramiv(this->handle, GL_INFO_LOG_LENGTH, &logLength);
         std::vector<char> error(logLength);
         glGetProgramInfoLog(this->handle, logLength, nullptr, &error[0]);
-        return std::string(error.begin(), error.end());
+        throw std::runtime_error(std::string(error.begin(), error.end()));
     }
-    return outcome::success();
 }
 
 void ShaderProgram::use() {

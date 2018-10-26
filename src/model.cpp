@@ -4,15 +4,17 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
+#include <stdexcept>
+
 #include <fmt/format.h>
 using namespace fmt;
 
-outcome::result<Model, std::string> Model::loadFromFile(const std::string& path) {
+Model Model::loadFromFile(const std::string& path) {
     Model model;
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(path.c_str(), aiProcess_Triangulate | aiProcess_FlipUVs);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-        return format("Failed to load model from {}: {}", path, importer.GetErrorString());
+        throw std::runtime_error(format("Failed to load model from {}: {}", path, importer.GetErrorString()));
     }
 
     // load vertex positions

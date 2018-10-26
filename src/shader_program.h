@@ -2,14 +2,12 @@
 #define SHADER_PROGRAM_H
 
 #include "shader.h"
+
 #include <string>
 
 #include <GL/glew.h>
 
 #include <glm/mat4x4.hpp>
-
-#include <outcome/outcome.hpp>
-namespace outcome = OUTCOME_V2_NAMESPACE;
 
 class ShaderProgram {
 public:
@@ -17,7 +15,7 @@ public:
     void attachShader(Shader shader);
     void setAttribLocation(const std::string& attribute, unsigned int location);
     void setUniform(const std::string& uniform, glm::mat4 data);
-    outcome::result<void, std::string> link();
+    void link();
     void use();
 
 private:

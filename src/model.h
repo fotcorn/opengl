@@ -9,18 +9,14 @@
 
 #include <GL/glew.h>
 
-#include <outcome/outcome.hpp>
-namespace outcome = OUTCOME_V2_NAMESPACE;
-
 class Model {
 public:
-    static outcome::result<Model, std::string> loadFromFile(const std::string& path);
+    static Model loadFromFile(const std::string& path);
     void addTexture(Texture texture);
     void draw(bool wireframe);
 
 private:
-    Model() {
-    }
+    Model() = default;
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
     std::vector<Texture> textures;
