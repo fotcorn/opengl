@@ -23,6 +23,10 @@ void glfwErrorCallback(int /*unused*/, const char* message) {
     cerr << "GLFW error:" << message << endl;
 }
 
+void glfwFramebufferSizeCallback(GLFWwindow* /*unused*/, int width, int height) {
+    glViewport(0, 0, width, height);
+}
+
 void openglErrorCallback(GLenum /*unused*/, GLenum type, GLuint /*unused*/, GLenum severity, GLsizei /*unused*/,
                          const GLchar* message, const void* /*unused*/) {
     fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
@@ -77,6 +81,9 @@ int main() {
     }
 
     glfwMakeContextCurrent(window);
+    glfwSetFramebufferSizeCallback(window, glfwFramebufferSizeCallback);
+
+    // glew
     glewExperimental = GL_TRUE;
     glewInit();
 
