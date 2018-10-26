@@ -10,6 +10,11 @@ using namespace std;
 #include <fmt/format.h>
 using namespace fmt;
 
+#include <imgui.h>
+
+#include "gui/imgui_impl_glfw.h"
+#include "gui/imgui_impl_opengl3.h"
+
 #include "shader.h"
 #include "shader_program.h"
 // #include "object.h"
@@ -124,6 +129,13 @@ int main() {
     }
     ShaderProgram program = shaderProgramResult.value();
 
+    // Setup Dear ImGui binding
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init();
+    ImGui::StyleColorsDark();
+
     while (!glfwWindowShouldClose(window)) {
         // world space to camera space
         // rotate around origin
@@ -141,6 +153,14 @@ int main() {
         program.setUniform("mvp", mvp);
         spaceShip.draw();
         // object1.draw();
+
+        // draw gui
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        ImGui::Text("Hello, world!"); // Display some text (you can use a format string too)
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwPollEvents();
         glfwSwapBuffers(window);

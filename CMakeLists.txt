@@ -18,5 +18,6 @@ conan_basic_setup()
 # add lib/ directory to include path as SYSTEM includes, this ignores generated warnings
 include_directories(SYSTEM lib/)
 
-add_executable(opengl src/main.cpp src/shader.cpp src/shader_program.cpp src/object.cpp src/model.cpp src/texture.cpp)
+add_executable(opengl src/main.cpp src/shader.cpp src/shader_program.cpp src/object.cpp src/model.cpp src/texture.cpp
+                      src/gui/imgui_impl_opengl3.cpp src/gui/imgui_impl_glfw.cpp)
 target_link_libraries(opengl ${CONAN_LIBS})
