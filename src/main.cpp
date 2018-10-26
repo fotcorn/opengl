@@ -122,7 +122,10 @@ int main() {
     // Setup Dear ImGui binding
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplGlfw_InitForOpenGL(window, false);
+    glfwSetMouseButtonCallback(window, ImGui_ImplGlfw_MouseButtonCallback);
+    glfwSetScrollCallback(window, ImGui_ImplGlfw_ScrollCallback);
+
     ImGui_ImplOpenGL3_Init();
     ImGui::StyleColorsDark();
 
@@ -130,7 +133,22 @@ int main() {
     float cameraY = 5.0f;
     float cameraZ = -4.0f;
 
+    float lastFrame = 0.0f;
+    float deltaTime = 0.0f;
     while (!glfwWindowShouldClose(window)) {
+        // handle input
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
+        // float cameraSpeed = 0.05f * deltaTime;
+        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+            model = glm::rotate(model, glm::radians(40.0f * deltaTime), glm::vec3(0.0f, 1.0f, 0.0f));
+        }
+        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+            model = glm::rotate(model, glm::radians(-40.0f * deltaTime), glm::vec3(0.0f, 1.0f, 0.0f));
+        }
+
         // world space to camera space
         glm::mat4 view;
         view = glm::lookAt(glm::vec3(cameraX, cameraY, cameraZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
