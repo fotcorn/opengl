@@ -148,6 +148,18 @@ int main() {
         if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
             model = glm::rotate(model, glm::radians(-40.0f * deltaTime), glm::vec3(0.0f, 1.0f, 0.0f));
         }
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+            model = glm::rotate(model, glm::radians(-40.0f * deltaTime), glm::vec3(0.0f, 0.0f, 1.0f));
+        }
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+            model = glm::rotate(model, glm::radians(40.0f * deltaTime), glm::vec3(0.0f, 0.0f, 1.0f));
+        }
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+            model = glm::rotate(model, glm::radians(40.0f * deltaTime), glm::vec3(1.0f, 0.0f, 0.0f));
+        }
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+            model = glm::rotate(model, glm::radians(-40.0f * deltaTime), glm::vec3(1.0f, 0.0f, 0.0f));
+        }
 
         // world space to camera space
         glm::mat4 view;
