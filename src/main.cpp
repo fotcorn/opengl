@@ -115,7 +115,6 @@ int main() {
 
     // model to world space
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::rotate(model, glm::radians(-30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     model = glm::scale(model, glm::vec3(0.001, 0.001, 0.001));
 
     // camera space to projection/2D space
@@ -138,14 +137,14 @@ int main() {
     ImGui_ImplOpenGL3_Init();
     ImGui::StyleColorsDark();
 
+    float cameraX = 3.0f;
+    float cameraY = 5.0f;
+    float cameraZ = -4.0f;
+
     while (!glfwWindowShouldClose(window)) {
         // world space to camera space
-        // rotate around origin
-        float radius = 5.0f;
-        float cameraX = sin(glfwGetTime()) * radius;
-        float cameraZ = cos(glfwGetTime()) * radius;
         glm::mat4 view;
-        view = glm::lookAt(glm::vec3(cameraX, 0.0, cameraZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+        view = glm::lookAt(glm::vec3(cameraX, cameraY, cameraZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 
         // full camera matrix
         glm::mat4 mvp = projection * view * model;
@@ -160,8 +159,11 @@ int main() {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        ImGui::Text("Hello, world!");
         ImGui::Checkbox("Wireframe", &wireframe);
+        ImGui::SliderFloat("Camera X", &cameraX, -10.0f, 10.0f);
+        ImGui::SliderFloat("Camera Y", &cameraY, -10.0f, 10.0f);
+        ImGui::SliderFloat("Camera Z", &cameraZ, -10.0f, 10.0f);
+
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
