@@ -66,6 +66,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_SAMPLES, 4);
 
     GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Hello World", nullptr, nullptr);
 
@@ -84,6 +85,7 @@ int main() {
 
     glEnable(GL_DEPTH_TEST); // enable depth testing
     glDepthFunc(GL_LESS); // smaller value is closer
+    glEnable(GL_MULTISAMPLE);
     glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
     auto modelLoadResult = Model::loadFromFile("model/Corvette-F3.obj");
