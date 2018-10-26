@@ -15,10 +15,9 @@ using namespace fmt;
 #include "gui/imgui_impl_glfw.h"
 #include "gui/imgui_impl_opengl3.h"
 
+#include "model.h"
 #include "shader.h"
 #include "shader_program.h"
-// #include "object.h"
-#include "model.h"
 
 void glfwErrorCallback(int /*unused*/, const char* message) {
     cerr << "GLFW error:" << message << endl;
@@ -87,16 +86,6 @@ int main() {
     glDepthFunc(GL_LESS); // smaller value is closer
     glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    /*Object object1({
-        0.5f,  0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        -0.5f, -0.5f, 0.0f,
-    }, {
-        1.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 1.0f,
-    });*/
-
     auto modelLoadResult = Model::loadFromFile("model/Corvette-F3.obj");
     if (!modelLoadResult) {
         cerr << modelLoadResult.error();
@@ -153,7 +142,6 @@ int main() {
         program.use();
         program.setUniform("mvp", mvp);
         spaceShip.draw(wireframe);
-        // object1.draw();
 
         // draw gui
         ImGui_ImplOpenGL3_NewFrame();
