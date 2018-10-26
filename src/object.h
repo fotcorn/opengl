@@ -2,14 +2,19 @@
 #define OBJECT_H
 
 #include <GL/glew.h>
+
 #include <vector>
 
-class Object {
-    GLuint vertexAttributeObject = 0;
+#include <glm/vec3.hpp>
 
+class Object {
 public:
-    Object(std::vector<GLfloat> points, std::vector<GLfloat> colors);
+    Object(std::vector<glm::vec3> vertics, std::vector<glm::vec3> colors, std::vector<glm::uvec3> indices);
     void draw();
+
+private:
+    GLuint vertexAttributeObject = 0;
+    unsigned int incidesCount = 0;
 };
 
 #endif

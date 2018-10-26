@@ -28,8 +28,10 @@ static void glfwFramebufferSizeCallback(GLFWwindow* /*unused*/, int width, int h
 
 static void openglErrorCallback(GLenum /*unused*/, GLenum type, GLuint /*unused*/, GLenum severity, GLsizei /*unused*/,
                                 const GLchar* message, const void* /*unused*/) {
-    fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
-            (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
+    if (severity != GL_DEBUG_SEVERITY_NOTIFICATION) {
+        fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+                (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
+    }
 }
 
 const int WINDOW_WIDTH = 1280;
@@ -41,7 +43,7 @@ void Program::init() {
     this->initOpenGL();
     this->initGui();
     this->loadModel();
-    this->loadShaders();
+    this->initLight();
     this->initCamera();
 }
 
@@ -94,23 +96,80 @@ void Program::initGui() {
     ImGui::StyleColorsDark();
 }
 
-void Program::loadShaders() {
-    Shader fragmentShader = Shader::loadFromFile("shaders/fragment.glsl", Shader::Type::Fragment);
-    Shader vertexShader = Shader::loadFromFile("shaders/vertex.glsl", Shader::Type::Vertex);
+void Program::loadModel() {
+    // load model
+    this->spaceShip = std::make_shared<Model>(Model::loadFromFile("model/Corvette-F3.obj"));
+    this->spaceShip->addTexture(Texture::loadFromFile("model/SF_Corvette-F3_diffuse.jpg"));
+
+    // load shader
+    Shader fragmentShader = Shader::loadFromFile("shaders/model_fragment.glsl", Shader::Type::Fragment);
+    Shader vertexShader = Shader::loadFromFile("shaders/model_vertex.glsl", Shader::Type::Vertex);
     this->spaceShipShaderProgram = std::make_shared<ShaderProgram>();
     this->spaceShipShaderProgram->attachShader(vertexShader);
     this->spaceShipShaderProgram->attachShader(fragmentShader);
     this->spaceShipShaderProgram->setAttribLocation("vertex_position", 0);
     this->spaceShipShaderProgram->setAttribLocation("texture_coordinate", 1);
     this->spaceShipShaderProgram->link();
-}
-
-void Program::loadModel() {
-    this->spaceShip = std::make_shared<Model>(Model::loadFromFile("model/Corvette-F3.obj"));
-    this->spaceShip->addTexture(Texture::loadFromFile("model/SF_Corvette-F3_diffuse.jpg"));
 
     // model to world space
     this->spaceShipModelMatrix = glm::scale(this->spaceShipModelMatrix, glm::vec3(0.001, 0.001, 0.001));
+}
+
+void Program::initLight() {
+    this->light = std::make_shared<Object>(Object(
+        {
+            // vertices
+            // front
+            glm::vec3(-1.0, -1.0, 1.0),
+            glm::vec3(1.0, -1.0, 1.0),
+            glm::vec3(1.0, 1.0, 1.0),
+            glm::vec3(-1.0, 1.0, 1.0),
+            // back
+            glm::vec3(-1.0, -1.0, -1.0),
+            glm::vec3(1.0, -1.0, -1.0),
+            glm::vec3(1.0, 1.0, -1.0),
+            glm::vec3(-1.0, 1.0, -1.0),
+        },
+        {
+            // colors
+            glm::vec3(1.0, 1.0, 1.0),
+            glm::vec3(1.0, 1.0, 1.0),
+            glm::vec3(1.0, 1.0, 1.0),
+            glm::vec3(1.0, 1.0, 1.0),
+            glm::vec3(1.0, 1.0, 1.0),
+            glm::vec3(1.0, 1.0, 1.0),
+            glm::vec3(1.0, 1.0, 1.0),
+            glm::vec3(1.0, 1.0, 1.0),
+        },
+        {
+            // indices
+            // front
+            glm::vec3(0, 1, 2),
+            glm::vec3(2, 3, 0),
+            // right
+            glm::vec3(1, 5, 6),
+            glm::vec3(6, 2, 1),
+            // back
+            glm::vec3(7, 6, 5),
+            glm::vec3(5, 4, 7),
+            // left
+            glm::vec3(4, 0, 3),
+            glm::vec3(3, 7, 4),
+            // bottom
+            glm::vec3(4, 5, 1),
+            glm::vec3(1, 0, 4),
+            // top
+            glm::vec3(3, 2, 6),
+            glm::vec3(6, 7, 3),
+        }));
+    Shader fragmentShader = Shader::loadFromFile("shaders/light_fragment.glsl", Shader::Type::Fragment);
+    Shader vertexShader = Shader::loadFromFile("shaders/light_vertex.glsl", Shader::Type::Vertex);
+    this->lightShaderProgram = std::make_shared<ShaderProgram>();
+    this->lightShaderProgram->attachShader(vertexShader);
+    this->lightShaderProgram->attachShader(fragmentShader);
+    this->lightShaderProgram->setAttribLocation("vertex_position", 0);
+    // this->lightShaderProgram->setAttribLocation("vertex_color", 1);
+    this->lightShaderProgram->link();
 }
 
 void Program::initCamera() {
@@ -124,6 +183,8 @@ void Program::mainLoop() {
     float cameraY = 5.0f;
     float cameraZ = -4.0f;
 
+    glm::vec3 lightPosition = glm::vec3(-15.0, 15.0, 5.0);
+
     float lastFrame = 0.0f;
     float deltaTime = 0.0f;
     while (!glfwWindowShouldClose(window)) {
@@ -132,7 +193,6 @@ void Program::mainLoop() {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        // float cameraSpeed = 0.05f * deltaTime;
         if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
             this->spaceShipModelMatrix =
                 glm::rotate(this->spaceShipModelMatrix, glm::radians(40.0f * deltaTime), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -158,17 +218,26 @@ void Program::mainLoop() {
                 glm::rotate(this->spaceShipModelMatrix, glm::radians(-40.0f * deltaTime), glm::vec3(1.0f, 0.0f, 0.0f));
         }
 
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         // world space to camera space
         glm::mat4 view;
         view = glm::lookAt(glm::vec3(cameraX, cameraY, cameraZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 
-        // full camera matrix
+        // draw space ship
         glm::mat4 mvp = this->projectionMatrix * view * this->spaceShipModelMatrix;
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         this->spaceShipShaderProgram->use();
         this->spaceShipShaderProgram->setUniform("mvp", mvp);
         this->spaceShip->draw(wireframe);
+
+        // draw light
+        glm::mat4 lightModel = glm::mat4(1.0f);
+        lightModel = glm::scale(lightModel, glm::vec3(0.1, 0.1, 0.1));
+        lightModel = glm::translate(lightModel, lightPosition);
+        mvp = this->projectionMatrix * view * lightModel;
+        this->lightShaderProgram->use();
+        this->lightShaderProgram->setUniform("mvp", mvp);
+        this->light->draw();
 
         // draw gui
         ImGui_ImplOpenGL3_NewFrame();
@@ -178,6 +247,10 @@ void Program::mainLoop() {
         ImGui::SliderFloat("Camera X", &cameraX, -10.0f, 10.0f);
         ImGui::SliderFloat("Camera Y", &cameraY, -10.0f, 10.0f);
         ImGui::SliderFloat("Camera Z", &cameraZ, -10.0f, 10.0f);
+
+        ImGui::SliderFloat("Light X", &lightPosition.x, -100.0f, 100.0f);
+        ImGui::SliderFloat("Light Y", &lightPosition.y, -100.0f, 100.0f);
+        ImGui::SliderFloat("Light Z", &lightPosition.z, -100.0f, 100.0f);
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
