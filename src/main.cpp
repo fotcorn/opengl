@@ -129,6 +129,8 @@ int main() {
     }
     ShaderProgram program = shaderProgramResult.value();
 
+    bool wireframe = false;
+
     // Setup Dear ImGui binding
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -151,14 +153,15 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         program.use();
         program.setUniform("mvp", mvp);
-        spaceShip.draw();
+        spaceShip.draw(wireframe);
         // object1.draw();
 
         // draw gui
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        ImGui::Text("Hello, world!"); // Display some text (you can use a format string too)
+        ImGui::Text("Hello, world!");
+        ImGui::Checkbox("Wireframe", &wireframe);
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 

@@ -16,7 +16,7 @@ class Model {
 public:
     static outcome::result<Model, std::string> loadFromFile(const std::string& path);
     void addTexture(Texture texture);
-    void draw();
+    void draw(bool wireframe);
 
 private:
     Model() {

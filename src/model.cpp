@@ -67,8 +67,8 @@ void Model::addTexture(Texture texture) {
     this->textures.push_back(texture);
 }
 
-void Model::draw() {
+void Model::draw(bool wireframe) {
     this->textures[0].bind();
     glBindVertexArray(this->vao);
-    glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, nullptr);
+    glDrawElements(wireframe ? GL_LINES : GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, nullptr);
 }
