@@ -235,21 +235,23 @@ void Program::mainLoop() {
         this->lightShaderProgram->setUniform("mvp", mvp);
         this->light->draw();
 
-        // draw gui
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-        ImGui::Checkbox("Wireframe", &wireframe);
-        ImGui::SliderFloat("Camera X", &cameraPosition.x, -10.0f, 10.0f);
-        ImGui::SliderFloat("Camera Y", &cameraPosition.y, -10.0f, 10.0f);
-        ImGui::SliderFloat("Camera Z", &cameraPosition.z, -10.0f, 10.0f);
+        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+            // draw gui
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+            ImGui::Checkbox("Wireframe", &wireframe);
+            ImGui::SliderFloat("Camera X", &cameraPosition.x, -10.0f, 10.0f);
+            ImGui::SliderFloat("Camera Y", &cameraPosition.y, -10.0f, 10.0f);
+            ImGui::SliderFloat("Camera Z", &cameraPosition.z, -10.0f, 10.0f);
 
-        ImGui::SliderFloat("Light X", &lightPosition.x, -100.0f, 100.0f);
-        ImGui::SliderFloat("Light Y", &lightPosition.y, -100.0f, 100.0f);
-        ImGui::SliderFloat("Light Z", &lightPosition.z, -100.0f, 100.0f);
+            ImGui::SliderFloat("Light X", &lightPosition.x, -100.0f, 100.0f);
+            ImGui::SliderFloat("Light Y", &lightPosition.y, -100.0f, 100.0f);
+            ImGui::SliderFloat("Light Z", &lightPosition.z, -100.0f, 100.0f);
 
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        }
 
         glfwPollEvents();
         glfwSwapBuffers(window);
