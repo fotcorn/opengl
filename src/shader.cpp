@@ -7,22 +7,23 @@ using namespace fmt;
 
 #include <fstream>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
-outcome::result<Shader, std::string> Shader::loadFromFile(const std::string& path, Type shaderType) {
+Shader Shader::loadFromFile(const std::string& path, Type shaderType) {
     Shader shader;
     if (shaderType == Type::Fragment) {
         shader.handle = glCreateShader(GL_FRAGMENT_SHADER);
     } else if (shaderType == Type::Vertex) {
         shader.handle = glCreateShader(GL_VERTEX_SHADER);
     } else {
-        return std::string("Unknown shader type");
+        throw std::runtime_error("Unknown shader type");
     }
 
     std::ifstream in(path.c_str(), std::ios::in);
     if (!in) {
-        return format("Failed to read shader file {}", path);
+        throw std::runtime_error(format("Failed to read shader file {}", path));
     }
 
     std::string source((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
@@ -37,7 +38,7 @@ outcome::result<Shader, std::string> Shader::loadFromFile(const std::string& pat
         glGetShaderiv(shader.handle, GL_INFO_LOG_LENGTH, &logLength);
         std::vector<char> error(logLength);
         glGetShaderInfoLog(shader.handle, logLength, nullptr, &error[0]);
-        return std::string(error.begin(), error.end());
+        throw std::runtime_error(std::string(error.begin(), error.end()));
     }
     return shader;
 }

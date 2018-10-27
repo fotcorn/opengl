@@ -6,13 +6,15 @@
 #include <fmt/format.h>
 using namespace fmt;
 
-outcome::result<Texture, std::string> Texture::loadFromFile(const std::string& path) {
+#include <stdexcept>
+
+Texture Texture::loadFromFile(const std::string& path) {
     Texture texture;
 
     int width, height, nrChannels;
     unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
     if (!data) {
-        return format("Failed to load texture {}", path);
+        throw std::runtime_error(format("Failed to load texture {}", path));
     }
 
     glGenTextures(1, &texture.handle);
