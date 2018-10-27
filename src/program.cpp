@@ -117,6 +117,7 @@ void Program::loadModel() {
     this->spaceShipShaderProgram->attachShader(fragmentShader);
     this->spaceShipShaderProgram->setAttribLocation("vertex_position", 0);
     this->spaceShipShaderProgram->setAttribLocation("texture_coordinate", 1);
+    this->spaceShipShaderProgram->setAttribLocation("normal", 2);
     this->spaceShipShaderProgram->link();
 
     // model to world space
@@ -176,7 +177,7 @@ void Program::initLight() {
     this->lightShaderProgram->attachShader(vertexShader);
     this->lightShaderProgram->attachShader(fragmentShader);
     this->lightShaderProgram->setAttribLocation("vertex_position", 0);
-    // this->lightShaderProgram->setAttribLocation("vertex_color", 1);
+    this->lightShaderProgram->setAttribLocation("vertex_color", 1);
     this->lightShaderProgram->link();
 }
 
@@ -236,6 +237,8 @@ void Program::mainLoop() {
         glm::mat4 mvp = this->projectionMatrix * view * this->spaceShipModelMatrix;
         this->spaceShipShaderProgram->use();
         this->spaceShipShaderProgram->setUniform("mvp", mvp);
+        this->spaceShipShaderProgram->setUniform("model", this->spaceShipModelMatrix);
+        this->spaceShipShaderProgram->setUniform("light_position", lightPosition);
         this->spaceShip->draw(wireframe);
 
         // draw light

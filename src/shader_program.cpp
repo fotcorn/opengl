@@ -39,3 +39,8 @@ void ShaderProgram::setUniform(const std::string& uniform, glm::mat4 data) {
     int location = glGetUniformLocation(this->handle, uniform.c_str());
     glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(data));
 }
+
+void ShaderProgram::setUniform(const std::string& uniform, glm::vec3 data) {
+    int location = glGetUniformLocation(this->handle, uniform.c_str());
+    glUniform3fv(location, 1, glm::value_ptr(data));
+}
