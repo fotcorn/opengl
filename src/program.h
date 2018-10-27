@@ -36,6 +36,8 @@ private:
 
     glm::mat4 spaceShipModelMatrix = glm::mat4(1.0f);
     glm::mat4 projectionMatrix = glm::mat4(1.0f);
+
+    bool drawGui = false;
 };
 
 #endif // !PROGRAM_H

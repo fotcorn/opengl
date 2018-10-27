@@ -178,6 +178,8 @@ void Program::initCamera() {
 
 void Program::mainLoop() {
     bool wireframe = false;
+    bool ctrlDown = false;
+
     glm::vec3 cameraPosition = glm::vec3(3.0, 5.0, -4.0);
     glm::vec3 lightPosition = glm::vec3(-15.0, 15.0, 5.0);
 
@@ -235,7 +237,14 @@ void Program::mainLoop() {
         this->lightShaderProgram->setUniform("mvp", mvp);
         this->light->draw();
 
-        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+        if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+            ctrlDown = true;
+        } else if (ctrlDown) {
+            ctrlDown = false;
+            this->drawGui = !drawGui;
+        }
+
+        if (drawGui) {
             // draw gui
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
