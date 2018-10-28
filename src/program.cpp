@@ -68,6 +68,7 @@ void Program::initGlfw() {
 
     glfwMakeContextCurrent(this->window);
     glfwSetFramebufferSizeCallback(this->window, glfwFramebufferSizeCallback);
+    glfwSetWindowUserPointer(this->window, (void*)this);
 }
 
 void Program::initGlew() {
@@ -90,8 +91,15 @@ void Program::initGui() {
     ImGui::CreateContext();
     ImGui_ImplGlfw_InitForOpenGL(this->window, false);
     glfwSetMouseButtonCallback(this->window, ImGui_ImplGlfw_MouseButtonCallback);
-    glfwSetScrollCallback(this->window, ImGui_ImplGlfw_ScrollCallback);
-
+    glfwSetCursorPosCallback(this->window, [](GLFWwindow* window, double xPosition, double yPosition) {
+        Program* program = (Program*)glfwGetWindowUserPointer(window);
+        program->mouseCursorPositionCallback(xPosition, yPosition);
+    });
+    glfwSetScrollCallback(this->window, [](GLFWwindow* window, double xPosition, double yPosition) {
+        Program* program = (Program*)glfwGetWindowUserPointer(window);
+        program->mouseScrollCallback(xPosition, yPosition);
+    });
+    glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     ImGui_ImplOpenGL3_Init();
     ImGui::StyleColorsDark();
 }
@@ -219,8 +227,10 @@ void Program::mainLoop() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // world space to camera space
-        glm::mat4 view;
-        view = glm::lookAt(cameraPosition, glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+        // glm::mat4 view = glm::lookAt(cameraPosition, glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+        // glm::mat4 view = glm::lookAt(cameraPosition, cameraFront, glm::vec3(0.0, 1.0, 0.0));
+        glm::mat4 view =
+            glm::lookAt(this->cameraFront * this->cameraDistance, glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 
         // draw space ship
         glm::mat4 mvp = this->projectionMatrix * view * this->spaceShipModelMatrix;
@@ -242,6 +252,15 @@ void Program::mainLoop() {
         } else if (ctrlDown) {
             ctrlDown = false;
             this->drawGui = !drawGui;
+            if (this->drawGui) {
+                glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            } else {
+                glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                double mouseX, mouseY;
+                glfwGetCursorPos(this->window, &mouseX, &mouseY);
+                this->lastX = mouseX;
+                this->lastY = mouseY;
+            }
         }
 
         if (drawGui) {
@@ -267,4 +286,50 @@ void Program::mainLoop() {
     }
 
     glfwTerminate();
+}
+
+void Program::mouseCursorPositionCallback(double xPosition, double yPosition) {
+    if (this->drawGui) {
+        return;
+    }
+    if (firstMouse) {
+        lastX = xPosition;
+        lastY = yPosition;
+        firstMouse = false;
+    }
+
+    float xoffset = xPosition - lastX;
+    float yoffset = yPosition - lastY; // reversed since y-coordinates go from bottom to top
+    lastX = xPosition;
+    lastY = yPosition;
+
+    float sensitivity = 0.1f; // change this value to your liking
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    yaw += xoffset;
+    pitch += yoffset;
+
+    // make sure that when pitch is out of bounds, screen doesn't get flipped
+    if (pitch > 89.0f)
+        pitch = 89.0f;
+    if (pitch < -89.0f)
+        pitch = -89.0f;
+
+    glm::vec3 front;
+    front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    front.y = sin(glm::radians(pitch));
+    front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    cameraFront = glm::normalize(front);
+}
+
+void Program::mouseScrollCallback(double xOffset, double yOffset) {
+    if (drawGui) {
+        ImGui_ImplGlfw_ScrollCallback(this->window, xOffset, yOffset);
+    } else {
+        cameraDistance -= yOffset;
+        if (cameraDistance < 2) {
+            cameraDistance = 1;
+        }
+    }
 }
