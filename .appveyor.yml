@@ -1,0 +1,17 @@
+platform:
+  - x64
+
+install:
+  - cmmd: echo "Downloading conan..."
+  - cmmd: set PATH=%PATH%;%PYTHON%/Scripts/
+  - cmmd: pip.exe install conan
+  - cmmd: conan user # Create the conan data directory
+  - cmmd: conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
+  - cmmd: conan --version
+
+build_script:
+  - cmmd: mkdir build
+  - cmmd: cd build
+  - cmmd: conan install .. -s build_type=Release -s compiler="Visual Studio" --build=missing
+  - cmmd: cmake .. -G "Visual Studio 15 2017 Win64"
+  - cmmd: cmake --build . --config Release
