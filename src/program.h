@@ -24,6 +24,7 @@ private:
     void initGui();
     void loadModel();
     void initLight();
+    void initHeightMap();
     void initCamera();
 
     void mouseCursorPositionCallback(double xPosition, double yPosition);
@@ -31,14 +32,21 @@ private:
 
     // members
     GLFWwindow* window = nullptr;
+
+    glm::mat4 projectionMatrix = glm::mat4(1.0f);
+
+    // spaceship
     std::shared_ptr<ShaderProgram> spaceShipShaderProgram;
     std::shared_ptr<Model> spaceShip;
+    glm::mat4 spaceShipModelMatrix = glm::mat4(1.0f);
 
+    // light
     std::shared_ptr<ShaderProgram> lightShaderProgram;
     std::shared_ptr<Object> light;
 
-    glm::mat4 spaceShipModelMatrix = glm::mat4(1.0f);
-    glm::mat4 projectionMatrix = glm::mat4(1.0f);
+    // heightmap
+    std::shared_ptr<ShaderProgram> heightMapShaderProgram;
+    std::shared_ptr<Object> heightMap;
 
     bool drawGui = false;
 

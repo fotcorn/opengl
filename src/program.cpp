@@ -14,6 +14,7 @@ using namespace fmt;
 #include "gui/imgui_impl_glfw.h"
 #include "gui/imgui_impl_opengl3.h"
 
+#include "heightmap.h"
 #include "model.h"
 #include "shader.h"
 #include "shader_program.h"
@@ -44,6 +45,7 @@ void Program::init() {
     this->initGui();
     this->loadModel();
     this->initLight();
+    this->initHeightMap();
     this->initCamera();
 }
 
@@ -180,6 +182,17 @@ void Program::initLight() {
     this->lightShaderProgram->link();
 }
 
+void Program::initHeightMap() {
+    this->heightMap = std::make_shared<Object>(loadHeightMap("assets/heightmap.png"));
+    Shader fragmentShader = Shader::loadFromFile("shaders/heightmap_fragment.glsl", Shader::Type::Fragment);
+    Shader vertexShader = Shader::loadFromFile("shaders/heightmap_vertex.glsl", Shader::Type::Vertex);
+    this->heightMapShaderProgram = std::make_shared<ShaderProgram>();
+    this->heightMapShaderProgram->attachShader(vertexShader);
+    this->heightMapShaderProgram->attachShader(fragmentShader);
+    this->heightMapShaderProgram->setAttribLocation("vertex_position", 0);
+    this->heightMapShaderProgram->link();
+}
+
 void Program::initCamera() {
     this->projectionMatrix = glm::perspective(glm::radians(45.0f), 1024.0f / 800.0f, 0.1f, 100.0f);
 }
@@ -190,6 +203,9 @@ void Program::mainLoop() {
 
     glm::vec3 cameraPosition = glm::vec3(3.0, 5.0, -4.0);
     glm::vec3 lightPosition = glm::vec3(-15.0, 15.0, 5.0);
+
+    glm::vec3 heightMapPosition = glm::vec3(0.0, -2.0, 0.0);
+    float heightMapScale = 0.1f;
 
     float lastFrame = 0.0f;
     float deltaTime = 0.0f;
@@ -247,6 +263,15 @@ void Program::mainLoop() {
         this->lightShaderProgram->setUniform("mvp", mvp);
         this->light->draw();
 
+        // draw heightmap
+        glm::mat4 heightMapModel = glm::mat4(1.0f);
+        heightMapModel = glm::scale(heightMapModel, glm::vec3(heightMapScale, heightMapScale, heightMapScale));
+        heightMapModel = glm::translate(heightMapModel, heightMapPosition);
+        mvp = this->projectionMatrix * view * heightMapModel;
+        this->heightMapShaderProgram->use();
+        this->heightMapShaderProgram->setUniform("mvp", mvp);
+        this->heightMap->draw();
+
         if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
             ctrlDown = true;
         } else if (ctrlDown) {
@@ -276,6 +301,11 @@ void Program::mainLoop() {
             ImGui::SliderFloat("Light X", &lightPosition.x, -100.0f, 100.0f);
             ImGui::SliderFloat("Light Y", &lightPosition.y, -100.0f, 100.0f);
             ImGui::SliderFloat("Light Z", &lightPosition.z, -100.0f, 100.0f);
+
+            ImGui::SliderFloat("Heightmap X", &heightMapPosition.x, -100.0f, 100.0f);
+            ImGui::SliderFloat("Heightmap Y", &heightMapPosition.y, -100.0f, 100.0f);
+            ImGui::SliderFloat("Heightmap Z", &heightMapPosition.z, -100.0f, 100.0f);
+            ImGui::SliderFloat("Heightmap Scale", &heightMapScale, -100.0f, 100.0f);
 
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
