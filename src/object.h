@@ -9,7 +9,8 @@
 
 class Object {
 public:
-    Object(std::vector<glm::vec3> vertics, std::vector<glm::vec3> colors, std::vector<glm::uvec3> indices);
+    Object(std::vector<glm::vec3> vertics, std::vector<glm::uvec3> indices);
+    Object(std::vector<glm::vec3> vertics, std::vector<glm::uvec3> indices, std::vector<glm::vec3> colors);
     void draw();
 
 private:

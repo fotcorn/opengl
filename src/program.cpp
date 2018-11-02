@@ -139,17 +139,6 @@ void Program::initLight() {
             glm::vec3(-1.0, 1.0, -1.0),
         },
         {
-            // colors
-            glm::vec3(1.0, 1.0, 1.0),
-            glm::vec3(1.0, 1.0, 1.0),
-            glm::vec3(1.0, 1.0, 1.0),
-            glm::vec3(1.0, 1.0, 1.0),
-            glm::vec3(1.0, 1.0, 1.0),
-            glm::vec3(1.0, 1.0, 1.0),
-            glm::vec3(1.0, 1.0, 1.0),
-            glm::vec3(1.0, 1.0, 1.0),
-        },
-        {
             // indices
             // front
             glm::vec3(0, 1, 2),
@@ -169,6 +158,17 @@ void Program::initLight() {
             // top
             glm::vec3(3, 2, 6),
             glm::vec3(6, 7, 3),
+        },
+        {
+            // colors
+            glm::vec3(1.0, 1.0, 1.0),
+            glm::vec3(1.0, 1.0, 1.0),
+            glm::vec3(1.0, 1.0, 1.0),
+            glm::vec3(1.0, 1.0, 1.0),
+            glm::vec3(1.0, 1.0, 1.0),
+            glm::vec3(1.0, 1.0, 1.0),
+            glm::vec3(1.0, 1.0, 1.0),
+            glm::vec3(1.0, 1.0, 1.0),
         }));
     Shader fragmentShader = Shader::loadFromFile("shaders/light_fragment.glsl", Shader::Type::Fragment);
     Shader vertexShader = Shader::loadFromFile("shaders/light_vertex.glsl", Shader::Type::Vertex);

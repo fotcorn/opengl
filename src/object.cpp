@@ -1,6 +1,6 @@
 #include "object.h"
 
-Object::Object(std::vector<glm::vec3> vertices, std::vector<glm::vec3> colors, std::vector<glm::uvec3> indices) {
+Object::Object(std::vector<glm::vec3> vertices, std::vector<glm::uvec3> indices) {
     glGenVertexArrays(1, &this->vertexAttributeObject); // one attribute
     glBindVertexArray(this->vertexAttributeObject);
 
@@ -20,7 +20,10 @@ Object::Object(std::vector<glm::vec3> vertices, std::vector<glm::vec3> colors, s
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(glm::uvec3) * indices.size(), &indices[0], GL_STATIC_DRAW);
 
     this->incidesCount = indices.size() * 3;
+}
 
+Object::Object(std::vector<glm::vec3> vertices, std::vector<glm::uvec3> indices, std::vector<glm::vec3> colors)
+    : Object(vertices, indices) {
     GLuint vertexColors = 0;
     glGenBuffers(1, &vertexColors); // one buffer in this vertex buffer object
     glBindBuffer(GL_ARRAY_BUFFER, vertexColors); // set current buffer
