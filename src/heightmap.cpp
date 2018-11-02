@@ -22,7 +22,7 @@ Object loadHeightMap(std::string path) {
     for (int w = 0; w < width; w++) {
         for (int h = 0; h < height; h++) {
             unsigned char elevation = data[w + h * width];
-            vertices.push_back(glm::vec3(w, elevation, h));
+            vertices.push_back(glm::vec3(w, elevation / 16, h));
         }
     }
 
