@@ -106,8 +106,8 @@ void Program::initGui() {
 
 void Program::loadModel() {
     // load model
-    this->spaceShip = std::make_shared<Model>(Model::loadFromFile("model/Corvette-F3.obj"));
-    this->spaceShip->addTexture(Texture::loadFromFile("model/SF_Corvette-F3_diffuse.jpg"));
+    this->spaceShip = std::make_shared<Model>(Model::loadFromFile("assets/spaceship/Corvette-F3.obj"));
+    this->spaceShip->addTexture(Texture::loadFromFile("assets/spaceship/SF_Corvette-F3_diffuse.jpg"));
 
     // load shader
     Shader fragmentShader = Shader::loadFromFile("shaders/model_fragment.glsl", Shader::Type::Fragment);
