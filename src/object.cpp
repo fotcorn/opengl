@@ -34,7 +34,7 @@ Object::Object(std::vector<glm::vec3> vertices, std::vector<glm::uvec3> indices,
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 }
 
-void Object::draw() {
+void Object::draw(bool wireframe) {
     glBindVertexArray(this->vertexAttributeObject);
-    glDrawElements(GL_TRIANGLES, this->incidesCount, GL_UNSIGNED_INT, nullptr);
+    glDrawElements(wireframe ? GL_LINES : GL_TRIANGLES, this->incidesCount, GL_UNSIGNED_INT, nullptr);
 }

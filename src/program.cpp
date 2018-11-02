@@ -261,7 +261,7 @@ void Program::mainLoop() {
         mvp = this->projectionMatrix * view * lightModel;
         this->lightShaderProgram->use();
         this->lightShaderProgram->setUniform("mvp", mvp);
-        this->light->draw();
+        this->light->draw(wireframe);
 
         // draw heightmap
         glm::mat4 heightMapModel = glm::mat4(1.0f);
@@ -270,7 +270,7 @@ void Program::mainLoop() {
         mvp = this->projectionMatrix * view * heightMapModel;
         this->heightMapShaderProgram->use();
         this->heightMapShaderProgram->setUniform("mvp", mvp);
-        this->heightMap->draw();
+        this->heightMap->draw(wireframe);
 
         if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
             ctrlDown = true;
