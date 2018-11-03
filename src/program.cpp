@@ -204,8 +204,8 @@ void Program::mainLoop() {
     glm::vec3 cameraPosition = glm::vec3(3.0, 5.0, -4.0);
     glm::vec3 lightPosition = glm::vec3(-15.0, 15.0, 5.0);
 
-    glm::vec3 heightMapPosition = glm::vec3(0.0, -2.0, 0.0);
-    float heightMapScale = 0.1f;
+    glm::vec3 heightMapPosition = glm::vec3(-100.0, -15.0, -100.0);
+    glm::vec3 heightMapScale = glm::vec3(1.0f, 2.0f, 1.0f);
 
     float lastFrame = 0.0f;
     float deltaTime = 0.0f;
@@ -265,7 +265,7 @@ void Program::mainLoop() {
 
         // draw heightmap
         glm::mat4 heightMapModel = glm::mat4(1.0f);
-        heightMapModel = glm::scale(heightMapModel, glm::vec3(heightMapScale, heightMapScale, heightMapScale));
+        heightMapModel = glm::scale(heightMapModel, heightMapScale);
         heightMapModel = glm::translate(heightMapModel, heightMapPosition);
         mvp = this->projectionMatrix * view * heightMapModel;
         this->heightMapShaderProgram->use();
@@ -302,10 +302,12 @@ void Program::mainLoop() {
             ImGui::SliderFloat("Light Y", &lightPosition.y, -100.0f, 100.0f);
             ImGui::SliderFloat("Light Z", &lightPosition.z, -100.0f, 100.0f);
 
-            ImGui::SliderFloat("Heightmap X", &heightMapPosition.x, -100.0f, 100.0f);
-            ImGui::SliderFloat("Heightmap Y", &heightMapPosition.y, -100.0f, 100.0f);
-            ImGui::SliderFloat("Heightmap Z", &heightMapPosition.z, -100.0f, 100.0f);
-            ImGui::SliderFloat("Heightmap Scale", &heightMapScale, -100.0f, 100.0f);
+            ImGui::SliderFloat("Heightmap X", &heightMapPosition.x, -1000.0f, 1000.0f);
+            ImGui::SliderFloat("Heightmap Y", &heightMapPosition.y, -1000.0f, 1000.0f);
+            ImGui::SliderFloat("Heightmap Z", &heightMapPosition.z, -1000.0f, 1000.0f);
+            ImGui::SliderFloat("Heightmap Scale X", &heightMapScale.x, -5.0f, 5.0f);
+            ImGui::SliderFloat("Heightmap Scale Y", &heightMapScale.y, -5.0f, 5.0f);
+            ImGui::SliderFloat("Heightmap Scale Z", &heightMapScale.z, -5.0f, 5.0f);
 
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
