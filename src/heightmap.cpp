@@ -30,9 +30,9 @@ Object loadHeightMap(std::string path) {
     for (int w = 0; w < width - 1; w++) {
         for (int h = 0; h < height - 1; h++) {
             // upper left triangle, CCW
-            indices.push_back(glm::uvec3(w, w + (h + 1) * height, w + 1));
+            indices.push_back(glm::uvec3(w + h * height, w + (h + 1) * height, w + 1 + h * height));
             // lower right triangle, CCW
-            indices.push_back(glm::uvec3(w + (h + 1) * height, w + 1 + (h + 1) * height, w + 1));
+            indices.push_back(glm::uvec3(w + (h + 1) * height, w + 1 + (h + 1) * height, w + 1 + h * height));
         }
     }
 
