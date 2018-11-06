@@ -4,6 +4,7 @@
 #include <stdexcept>
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 #include <glm/mat4x4.hpp>
 
 #include <fmt/format.h>
@@ -220,8 +221,11 @@ void Program::mainLoop() {
         this->spaceShipPosition += directionVector * (speed * deltaTime * 10.0f);
 
         // world space to camera space
-        glm::vec3 eye = this->spaceShipPosition - (directionVector * 8.0f) + cameraPosition;
         glm::vec3 up = this->spaceShipRotation * glm::vec3(0.0f, 1.0f, 0.0f);
+        glm::vec3 left = this->spaceShipRotation * glm::vec3(1.0f, 0.0f, 0.0f);
+
+        glm::vec3 dir = glm::rotate(directionVector, glm::radians(30.0f), left);
+        glm::vec3 eye = this->spaceShipPosition - dir * 8.0f;
         glm::mat4 view = glm::lookAt(eye, this->spaceShipPosition, up);
 
         // draw space ship
