@@ -121,8 +121,7 @@ void Program::loadModel() {
     this->spaceShipShaderProgram->setAttribLocation("texture_coordinate", 1);
     this->spaceShipShaderProgram->link();
 
-    // model to world space
-    this->spaceShipModelMatrix = glm::scale(this->spaceShipModelMatrix, glm::vec3(0.001, 0.001, 0.001));
+    this->spaceShipRotation = glm::angleAxis(glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 }
 
 void Program::initLight() {
@@ -218,7 +217,11 @@ void Program::mainLoop() {
             glm::lookAt(this->cameraFront * this->cameraDistance, glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 
         // draw space ship
-        glm::mat4 mvp = this->projectionMatrix * view * this->spaceShipModelMatrix;
+        glm::mat4 spaceShipModelMatrix = glm::toMat4(this->spaceShipRotation);
+        spaceShipModelMatrix = glm::scale(spaceShipModelMatrix, glm::vec3(0.001, 0.001, 0.001));
+        spaceShipModelMatrix = glm::translate(spaceShipModelMatrix, this->spaceShipPosition);
+
+        glm::mat4 mvp = this->projectionMatrix * view * spaceShipModelMatrix;
         this->spaceShipShaderProgram->use();
         this->spaceShipShaderProgram->setUniform("mvp", mvp);
         this->spaceShip->draw(wireframe);
@@ -295,28 +298,28 @@ void Program::handleInput() {
         }
     }
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-        this->spaceShipModelMatrix =
-            glm::rotate(this->spaceShipModelMatrix, glm::radians(40.0f * deltaTime), glm::vec3(0.0f, 1.0f, 0.0f));
+        this->spaceShipRotation =
+            glm::rotate(this->spaceShipRotation, glm::radians(40.0f * deltaTime), glm::vec3(0.0f, 1.0f, 0.0f));
     }
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-        this->spaceShipModelMatrix =
-            glm::rotate(this->spaceShipModelMatrix, glm::radians(-40.0f * deltaTime), glm::vec3(0.0f, 1.0f, 0.0f));
+        this->spaceShipRotation =
+            glm::rotate(this->spaceShipRotation, glm::radians(-40.0f * deltaTime), glm::vec3(0.0f, 1.0f, 0.0f));
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        this->spaceShipModelMatrix =
-            glm::rotate(this->spaceShipModelMatrix, glm::radians(-40.0f * deltaTime), glm::vec3(0.0f, 0.0f, 1.0f));
+        this->spaceShipRotation =
+            glm::rotate(this->spaceShipRotation, glm::radians(-40.0f * deltaTime), glm::vec3(0.0f, 0.0f, 1.0f));
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        this->spaceShipModelMatrix =
-            glm::rotate(this->spaceShipModelMatrix, glm::radians(40.0f * deltaTime), glm::vec3(0.0f, 0.0f, 1.0f));
+        this->spaceShipRotation =
+            glm::rotate(this->spaceShipRotation, glm::radians(40.0f * deltaTime), glm::vec3(0.0f, 0.0f, 1.0f));
     }
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        this->spaceShipModelMatrix =
-            glm::rotate(this->spaceShipModelMatrix, glm::radians(40.0f * deltaTime), glm::vec3(1.0f, 0.0f, 0.0f));
+        this->spaceShipRotation =
+            glm::rotate(this->spaceShipRotation, glm::radians(40.0f * deltaTime), glm::vec3(1.0f, 0.0f, 0.0f));
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        this->spaceShipModelMatrix =
-            glm::rotate(this->spaceShipModelMatrix, glm::radians(-40.0f * deltaTime), glm::vec3(1.0f, 0.0f, 0.0f));
+        this->spaceShipRotation =
+            glm::rotate(this->spaceShipRotation, glm::radians(-40.0f * deltaTime), glm::vec3(1.0f, 0.0f, 0.0f));
     }
 
     if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
