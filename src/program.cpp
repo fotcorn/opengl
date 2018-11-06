@@ -199,7 +199,7 @@ void Program::initCamera() {
 void Program::mainLoop() {
     bool wireframe = false;
 
-    glm::vec3 cameraPosition = glm::vec3(3.0, 5.0, -4.0);
+    glm::vec3 cameraPosition = glm::vec3(0.0, 2.5, 0.0);
     glm::vec3 lightPosition = glm::vec3(-15.0, 15.0, 5.0);
 
     glm::vec3 heightMapPosition = glm::vec3(-100.0, -15.0, -100.0);
@@ -219,8 +219,8 @@ void Program::mainLoop() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // world space to camera space
-        glm::mat4 view =
-            glm::lookAt(this->cameraFront * this->cameraDistance, glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+        glm::vec3 eye = this->spaceShipPosition - (directionVector * 8.0f) + cameraPosition;
+        glm::mat4 view = glm::lookAt(eye, this->spaceShipPosition, glm::vec3(0.0, 1.0, 0.0));
 
         // draw space ship
         glm::mat4 spaceShipModelMatrix = glm::translate(glm::mat4(1.0f), this->spaceShipPosition);
