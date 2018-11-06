@@ -282,6 +282,18 @@ void Program::handleInput() {
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+        this->speed += 1.0 * deltaTime;
+        if (this->speed > 100.0) {
+            this->speed = 100.0;
+        }
+    }
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+        this->speed -= 1.0 * deltaTime;
+        if (this->speed < 0.0) {
+            this->speed = 0;
+        }
+    }
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
         this->spaceShipModelMatrix =
             glm::rotate(this->spaceShipModelMatrix, glm::radians(40.0f * deltaTime), glm::vec3(0.0f, 1.0f, 0.0f));

@@ -52,6 +52,9 @@ private:
 
     bool drawGui = false;
 
+    // movement
+    float speed = 0;
+
     // camera
     glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
     float cameraDistance = 5.0f;
