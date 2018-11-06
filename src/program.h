@@ -27,6 +27,8 @@ private:
     void initHeightMap();
     void initCamera();
 
+    void handleInput();
+
     void mouseCursorPositionCallback(double xPosition, double yPosition);
     void mouseScrollCallback(double xOffset, double yOffset);
 

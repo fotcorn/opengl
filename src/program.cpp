@@ -199,7 +199,6 @@ void Program::initCamera() {
 
 void Program::mainLoop() {
     bool wireframe = false;
-    bool ctrlDown = false;
 
     glm::vec3 cameraPosition = glm::vec3(3.0, 5.0, -4.0);
     glm::vec3 lightPosition = glm::vec3(-15.0, 15.0, 5.0);
@@ -207,38 +206,8 @@ void Program::mainLoop() {
     glm::vec3 heightMapPosition = glm::vec3(-100.0, -15.0, -100.0);
     glm::vec3 heightMapScale = glm::vec3(1.0f, 2.0f, 1.0f);
 
-    float lastFrame = 0.0f;
-    float deltaTime = 0.0f;
     while (!glfwWindowShouldClose(window)) {
-        // handle input
-        float currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
-
-        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-            this->spaceShipModelMatrix =
-                glm::rotate(this->spaceShipModelMatrix, glm::radians(40.0f * deltaTime), glm::vec3(0.0f, 1.0f, 0.0f));
-        }
-        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-            this->spaceShipModelMatrix =
-                glm::rotate(this->spaceShipModelMatrix, glm::radians(-40.0f * deltaTime), glm::vec3(0.0f, 1.0f, 0.0f));
-        }
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-            this->spaceShipModelMatrix =
-                glm::rotate(this->spaceShipModelMatrix, glm::radians(-40.0f * deltaTime), glm::vec3(0.0f, 0.0f, 1.0f));
-        }
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-            this->spaceShipModelMatrix =
-                glm::rotate(this->spaceShipModelMatrix, glm::radians(40.0f * deltaTime), glm::vec3(0.0f, 0.0f, 1.0f));
-        }
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-            this->spaceShipModelMatrix =
-                glm::rotate(this->spaceShipModelMatrix, glm::radians(40.0f * deltaTime), glm::vec3(1.0f, 0.0f, 0.0f));
-        }
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-            this->spaceShipModelMatrix =
-                glm::rotate(this->spaceShipModelMatrix, glm::radians(-40.0f * deltaTime), glm::vec3(1.0f, 0.0f, 0.0f));
-        }
+        this->handleInput();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -272,22 +241,6 @@ void Program::mainLoop() {
         this->heightMapShaderProgram->setUniform("mvp", mvp);
         this->heightMap->draw(wireframe);
 
-        if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-            ctrlDown = true;
-        } else if (ctrlDown) {
-            ctrlDown = false;
-            this->drawGui = !drawGui;
-            if (this->drawGui) {
-                glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-            } else {
-                glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-                double mouseX, mouseY;
-                glfwGetCursorPos(this->window, &mouseX, &mouseY);
-                this->lastX = mouseX;
-                this->lastY = mouseY;
-            }
-        }
-
         if (drawGui) {
             // draw gui
             ImGui_ImplOpenGL3_NewFrame();
@@ -318,6 +271,57 @@ void Program::mainLoop() {
     }
 
     glfwTerminate();
+}
+
+void Program::handleInput() {
+    static float lastFrame = 0.0f;
+    static float deltaTime = 0.0f;
+    static bool ctrlDown = false;
+
+    float currentFrame = glfwGetTime();
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
+
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+        this->spaceShipModelMatrix =
+            glm::rotate(this->spaceShipModelMatrix, glm::radians(40.0f * deltaTime), glm::vec3(0.0f, 1.0f, 0.0f));
+    }
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+        this->spaceShipModelMatrix =
+            glm::rotate(this->spaceShipModelMatrix, glm::radians(-40.0f * deltaTime), glm::vec3(0.0f, 1.0f, 0.0f));
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        this->spaceShipModelMatrix =
+            glm::rotate(this->spaceShipModelMatrix, glm::radians(-40.0f * deltaTime), glm::vec3(0.0f, 0.0f, 1.0f));
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        this->spaceShipModelMatrix =
+            glm::rotate(this->spaceShipModelMatrix, glm::radians(40.0f * deltaTime), glm::vec3(0.0f, 0.0f, 1.0f));
+    }
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        this->spaceShipModelMatrix =
+            glm::rotate(this->spaceShipModelMatrix, glm::radians(40.0f * deltaTime), glm::vec3(1.0f, 0.0f, 0.0f));
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        this->spaceShipModelMatrix =
+            glm::rotate(this->spaceShipModelMatrix, glm::radians(-40.0f * deltaTime), glm::vec3(1.0f, 0.0f, 0.0f));
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+        ctrlDown = true;
+    } else if (ctrlDown) {
+        ctrlDown = false;
+        this->drawGui = !drawGui;
+        if (this->drawGui) {
+            glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        } else {
+            glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            double mouseX, mouseY;
+            glfwGetCursorPos(this->window, &mouseX, &mouseY);
+            this->lastX = mouseX;
+            this->lastY = mouseY;
+        }
+    }
 }
 
 void Program::mouseCursorPositionCallback(double xPosition, double yPosition) {
@@ -356,7 +360,7 @@ void Program::mouseCursorPositionCallback(double xPosition, double yPosition) {
 }
 
 void Program::mouseScrollCallback(double xOffset, double yOffset) {
-    if (drawGui) {
+    if (this->drawGui) {
         ImGui_ImplGlfw_ScrollCallback(this->window, xOffset, yOffset);
     } else {
         cameraDistance -= yOffset;
