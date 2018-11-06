@@ -206,20 +206,26 @@ void Program::mainLoop() {
     glm::vec3 heightMapScale = glm::vec3(1.0f, 2.0f, 1.0f);
 
     while (!glfwWindowShouldClose(window)) {
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
         this->handleInput();
+
+        glm::vec3 forward = glm::vec3(0.0f, 0.0f, 1.0f);
+        glm::vec3 directionVector = this->spaceShipRotation * forward;
+        this->spaceShipPosition += directionVector * (speed * deltaTime * 10.0f);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // world space to camera space
-        // glm::mat4 view = glm::lookAt(cameraPosition, glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
-        // glm::mat4 view = glm::lookAt(cameraPosition, cameraFront, glm::vec3(0.0, 1.0, 0.0));
         glm::mat4 view =
             glm::lookAt(this->cameraFront * this->cameraDistance, glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 
         // draw space ship
-        glm::mat4 spaceShipModelMatrix = glm::toMat4(this->spaceShipRotation);
+        glm::mat4 spaceShipModelMatrix = glm::translate(glm::mat4(1.0f), this->spaceShipPosition);
         spaceShipModelMatrix = glm::scale(spaceShipModelMatrix, glm::vec3(0.001, 0.001, 0.001));
-        spaceShipModelMatrix = glm::translate(spaceShipModelMatrix, this->spaceShipPosition);
+        spaceShipModelMatrix *= glm::toMat4(this->spaceShipRotation);
 
         glm::mat4 mvp = this->projectionMatrix * view * spaceShipModelMatrix;
         this->spaceShipShaderProgram->use();
@@ -277,13 +283,7 @@ void Program::mainLoop() {
 }
 
 void Program::handleInput() {
-    static float lastFrame = 0.0f;
-    static float deltaTime = 0.0f;
     static bool ctrlDown = false;
-
-    float currentFrame = glfwGetTime();
-    deltaTime = currentFrame - lastFrame;
-    lastFrame = currentFrame;
 
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
         this->speed += 1.0 * deltaTime;
