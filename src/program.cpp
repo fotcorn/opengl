@@ -212,15 +212,17 @@ void Program::mainLoop() {
 
         this->handleInput();
 
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // simulation
         glm::vec3 forward = glm::vec3(0.0f, 0.0f, 1.0f);
         glm::vec3 directionVector = this->spaceShipRotation * forward;
         this->spaceShipPosition += directionVector * (speed * deltaTime * 10.0f);
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         // world space to camera space
         glm::vec3 eye = this->spaceShipPosition - (directionVector * 8.0f) + cameraPosition;
-        glm::mat4 view = glm::lookAt(eye, this->spaceShipPosition, glm::vec3(0.0, 1.0, 0.0));
+        glm::vec3 up = this->spaceShipRotation * glm::vec3(0.0f, 1.0f, 0.0f);
+        glm::mat4 view = glm::lookAt(eye, this->spaceShipPosition, up);
 
         // draw space ship
         glm::mat4 spaceShipModelMatrix = glm::translate(glm::mat4(1.0f), this->spaceShipPosition);
