@@ -44,9 +44,7 @@ void Program::init() {
     this->initGlew();
     this->initOpenGL();
     this->initGui();
-    this->loadModel();
-    this->initLight();
-    this->initHeightMap();
+    this->initCube();
     this->initCamera();
 }
 
@@ -107,26 +105,8 @@ void Program::initGui() {
     ImGui::StyleColorsDark();
 }
 
-void Program::loadModel() {
-    // load model
-    this->spaceShip = std::make_shared<Model>(Model::loadFromFile("assets/spaceship/Corvette-F3.obj"));
-    this->spaceShip->addTexture(Texture::loadFromFile("assets/spaceship/SF_Corvette-F3_diffuse.jpg"));
-
-    // load shader
-    Shader fragmentShader = Shader::loadFromFile("shaders/model_fragment.glsl", Shader::Type::Fragment);
-    Shader vertexShader = Shader::loadFromFile("shaders/model_vertex.glsl", Shader::Type::Vertex);
-    this->spaceShipShaderProgram = std::make_shared<ShaderProgram>();
-    this->spaceShipShaderProgram->attachShader(vertexShader);
-    this->spaceShipShaderProgram->attachShader(fragmentShader);
-    this->spaceShipShaderProgram->setAttribLocation("vertex_position", 0);
-    this->spaceShipShaderProgram->setAttribLocation("texture_coordinate", 1);
-    this->spaceShipShaderProgram->link();
-
-    this->spaceShipRotation = glm::angleAxis(glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-}
-
-void Program::initLight() {
-    this->light = std::make_shared<Object>(Object(
+void Program::initCube() {
+    this->cube = std::make_shared<Object>(Object(
         {
             // vertices
             // front
@@ -172,25 +152,14 @@ void Program::initLight() {
             glm::vec3(1.0, 1.0, 1.0),
             glm::vec3(1.0, 1.0, 1.0),
         }));
-    Shader fragmentShader = Shader::loadFromFile("shaders/light_fragment.glsl", Shader::Type::Fragment);
-    Shader vertexShader = Shader::loadFromFile("shaders/light_vertex.glsl", Shader::Type::Vertex);
-    this->lightShaderProgram = std::make_shared<ShaderProgram>();
-    this->lightShaderProgram->attachShader(vertexShader);
-    this->lightShaderProgram->attachShader(fragmentShader);
-    this->lightShaderProgram->setAttribLocation("vertex_position", 0);
-    // this->lightShaderProgram->setAttribLocation("vertex_color", 1);
-    this->lightShaderProgram->link();
-}
-
-void Program::initHeightMap() {
-    this->heightMap = std::make_shared<Object>(loadHeightMap("assets/heightmap.png"));
-    Shader fragmentShader = Shader::loadFromFile("shaders/heightmap_fragment.glsl", Shader::Type::Fragment);
-    Shader vertexShader = Shader::loadFromFile("shaders/heightmap_vertex.glsl", Shader::Type::Vertex);
-    this->heightMapShaderProgram = std::make_shared<ShaderProgram>();
-    this->heightMapShaderProgram->attachShader(vertexShader);
-    this->heightMapShaderProgram->attachShader(fragmentShader);
-    this->heightMapShaderProgram->setAttribLocation("vertex_position", 0);
-    this->heightMapShaderProgram->link();
+    Shader fragmentShader = Shader::loadFromFile("shaders/cube_fragment.glsl", Shader::Type::Fragment);
+    Shader vertexShader = Shader::loadFromFile("shaders/cube_vertex.glsl", Shader::Type::Vertex);
+    this->cubeShaderProgram = std::make_shared<ShaderProgram>();
+    this->cubeShaderProgram->attachShader(vertexShader);
+    this->cubeShaderProgram->attachShader(fragmentShader);
+    this->cubeShaderProgram->setAttribLocation("vertex_position", 0);
+    // this->cubeShaderProgram->setAttribLocation("vertex_color", 1);
+    this->cubeShaderProgram->link();
 }
 
 void Program::initCamera() {
@@ -201,10 +170,7 @@ void Program::mainLoop() {
     bool wireframe = false;
 
     glm::vec3 cameraPosition = glm::vec3(0.0, 2.5, 0.0);
-    glm::vec3 lightPosition = glm::vec3(-15.0, 15.0, 5.0);
-
-    glm::vec3 heightMapPosition = glm::vec3(-100.0, -15.0, -100.0);
-    glm::vec3 heightMapScale = glm::vec3(1.0f, 2.0f, 1.0f);
+    glm::vec3 cubePosition = glm::vec3(-15.0, 15.0, 5.0);
 
     while (!glfwWindowShouldClose(window)) {
         float currentFrame = glfwGetTime();
@@ -215,46 +181,27 @@ void Program::mainLoop() {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // simulation
-        glm::vec3 forward = glm::vec3(0.0f, 0.0f, 1.0f);
-        glm::vec3 directionVector = this->spaceShipRotation * forward;
-        this->spaceShipPosition += directionVector * (speed * deltaTime * 10.0f);
-
         // world space to camera space
+        /*
         glm::vec3 up = this->spaceShipRotation * glm::vec3(0.0f, 1.0f, 0.0f);
         glm::vec3 left = this->spaceShipRotation * glm::vec3(1.0f, 0.0f, 0.0f);
 
         glm::vec3 dir = glm::rotate(directionVector, glm::radians(30.0f), left);
         glm::vec3 eye = this->spaceShipPosition - dir * 8.0f;
-        glm::mat4 view = glm::lookAt(eye, this->spaceShipPosition, up);
+        */
+        glm::vec3 eye = glm::vec3(1.0, 1.0, 1.0);
+        glm::vec3 up = glm::vec3(0.0, 1.0, 0.0);
+        glm::vec3 position = glm::vec3(1.0, 1.0, 1.0);
+        glm::mat4 view = glm::lookAt(eye, position, up);
 
-        // draw space ship
-        glm::mat4 spaceShipModelMatrix = glm::translate(glm::mat4(1.0f), this->spaceShipPosition);
-        spaceShipModelMatrix = glm::scale(spaceShipModelMatrix, glm::vec3(0.001, 0.001, 0.001));
-        spaceShipModelMatrix *= glm::toMat4(this->spaceShipRotation);
-
-        glm::mat4 mvp = this->projectionMatrix * view * spaceShipModelMatrix;
-        this->spaceShipShaderProgram->use();
-        this->spaceShipShaderProgram->setUniform("mvp", mvp);
-        this->spaceShip->draw(wireframe);
-
-        // draw light
-        glm::mat4 lightModel = glm::mat4(1.0f);
-        lightModel = glm::scale(lightModel, glm::vec3(0.1, 0.1, 0.1));
-        lightModel = glm::translate(lightModel, lightPosition);
-        mvp = this->projectionMatrix * view * lightModel;
-        this->lightShaderProgram->use();
-        this->lightShaderProgram->setUniform("mvp", mvp);
-        this->light->draw(wireframe);
-
-        // draw heightmap
-        glm::mat4 heightMapModel = glm::mat4(1.0f);
-        heightMapModel = glm::scale(heightMapModel, heightMapScale);
-        heightMapModel = glm::translate(heightMapModel, heightMapPosition);
-        mvp = this->projectionMatrix * view * heightMapModel;
-        this->heightMapShaderProgram->use();
-        this->heightMapShaderProgram->setUniform("mvp", mvp);
-        this->heightMap->draw(wireframe);
+        // draw cube
+        glm::mat4 cubeModel = glm::mat4(1.0f);
+        cubeModel = glm::scale(cubeModel, glm::vec3(0.1, 0.1, 0.1));
+        cubeModel = glm::translate(cubeModel, cubePosition);
+        auto mvp = this->projectionMatrix * view * cubeModel;
+        this->cubeShaderProgram->use();
+        this->cubeShaderProgram->setUniform("mvp", mvp);
+        this->cube->draw(wireframe);
 
         if (drawGui) {
             // draw gui
@@ -265,17 +212,6 @@ void Program::mainLoop() {
             ImGui::SliderFloat("Camera X", &cameraPosition.x, -10.0f, 10.0f);
             ImGui::SliderFloat("Camera Y", &cameraPosition.y, -10.0f, 10.0f);
             ImGui::SliderFloat("Camera Z", &cameraPosition.z, -10.0f, 10.0f);
-
-            ImGui::SliderFloat("Light X", &lightPosition.x, -100.0f, 100.0f);
-            ImGui::SliderFloat("Light Y", &lightPosition.y, -100.0f, 100.0f);
-            ImGui::SliderFloat("Light Z", &lightPosition.z, -100.0f, 100.0f);
-
-            ImGui::SliderFloat("Heightmap X", &heightMapPosition.x, -1000.0f, 1000.0f);
-            ImGui::SliderFloat("Heightmap Y", &heightMapPosition.y, -1000.0f, 1000.0f);
-            ImGui::SliderFloat("Heightmap Z", &heightMapPosition.z, -1000.0f, 1000.0f);
-            ImGui::SliderFloat("Heightmap Scale X", &heightMapScale.x, -5.0f, 5.0f);
-            ImGui::SliderFloat("Heightmap Scale Y", &heightMapScale.y, -5.0f, 5.0f);
-            ImGui::SliderFloat("Heightmap Scale Z", &heightMapScale.z, -5.0f, 5.0f);
 
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -291,41 +227,21 @@ void Program::mainLoop() {
 void Program::handleInput() {
     static bool ctrlDown = false;
 
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-        this->speed += 1.0 * deltaTime;
-        if (this->speed > 100.0) {
-            this->speed = 100.0;
-        }
-    }
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-        this->speed -= 1.0 * deltaTime;
-        if (this->speed < 0.0) {
-            this->speed = 0;
-        }
-    }
-    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-        this->spaceShipRotation =
-            glm::rotate(this->spaceShipRotation, glm::radians(40.0f * deltaTime), glm::vec3(0.0f, 1.0f, 0.0f));
-    }
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-        this->spaceShipRotation =
-            glm::rotate(this->spaceShipRotation, glm::radians(-40.0f * deltaTime), glm::vec3(0.0f, 1.0f, 0.0f));
-    }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        this->spaceShipRotation =
-            glm::rotate(this->spaceShipRotation, glm::radians(-40.0f * deltaTime), glm::vec3(0.0f, 0.0f, 1.0f));
+        // this->spaceShipRotation =
+        //     glm::rotate(this->spaceShipRotation, glm::radians(-40.0f * deltaTime), glm::vec3(0.0f, 0.0f, 1.0f));
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        this->spaceShipRotation =
-            glm::rotate(this->spaceShipRotation, glm::radians(40.0f * deltaTime), glm::vec3(0.0f, 0.0f, 1.0f));
+        // this->spaceShipRotation =
+        //     glm::rotate(this->spaceShipRotation, glm::radians(40.0f * deltaTime), glm::vec3(0.0f, 0.0f, 1.0f));
     }
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        this->spaceShipRotation =
-            glm::rotate(this->spaceShipRotation, glm::radians(40.0f * deltaTime), glm::vec3(1.0f, 0.0f, 0.0f));
+        // this->spaceShipRotation =
+        //     glm::rotate(this->spaceShipRotation, glm::radians(40.0f * deltaTime), glm::vec3(1.0f, 0.0f, 0.0f));
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        this->spaceShipRotation =
-            glm::rotate(this->spaceShipRotation, glm::radians(-40.0f * deltaTime), glm::vec3(1.0f, 0.0f, 0.0f));
+        // this->spaceShipRotation =
+        //     glm::rotate(this->spaceShipRotation, glm::radians(-40.0f * deltaTime), glm::vec3(1.0f, 0.0f, 0.0f));
     }
 
     if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {

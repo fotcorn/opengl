@@ -26,9 +26,7 @@ private:
     void initGlew();
     void initOpenGL();
     void initGui();
-    void loadModel();
-    void initLight();
-    void initHeightMap();
+    void initCube();
     void initCamera();
 
     void handleInput();
@@ -41,25 +39,11 @@ private:
 
     glm::mat4 projectionMatrix = glm::mat4(1.0f);
 
-    // spaceship
-    std::shared_ptr<ShaderProgram> spaceShipShaderProgram;
-    std::shared_ptr<Model> spaceShip;
-
-    glm::quat spaceShipRotation = glm::quat();
-    glm::vec3 spaceShipPosition = glm::vec3();
-
-    // light
-    std::shared_ptr<ShaderProgram> lightShaderProgram;
-    std::shared_ptr<Object> light;
-
-    // heightmap
-    std::shared_ptr<ShaderProgram> heightMapShaderProgram;
-    std::shared_ptr<Object> heightMap;
+    // cube
+    std::shared_ptr<ShaderProgram> cubeShaderProgram;
+    std::shared_ptr<Object> cube;
 
     bool drawGui = false;
-
-    // movement
-    float speed = 0;
 
     // timing
     float lastFrame = 0.0f;
