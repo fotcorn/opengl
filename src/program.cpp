@@ -169,7 +169,7 @@ void Program::initCamera() {
 void Program::mainLoop() {
     bool wireframe = false;
 
-    glm::vec3 cameraPosition = glm::vec3(0.0, 2.5, 0.0);
+    glm::vec3 cameraPosition = glm::vec3(-7.0, 2.5, 0.0);
     glm::vec3 cubePosition = glm::vec3(-15.0, 15.0, 5.0);
 
     while (!glfwWindowShouldClose(window)) {
@@ -181,18 +181,9 @@ void Program::mainLoop() {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // world space to camera space
-        /*
-        glm::vec3 up = this->spaceShipRotation * glm::vec3(0.0f, 1.0f, 0.0f);
-        glm::vec3 left = this->spaceShipRotation * glm::vec3(1.0f, 0.0f, 0.0f);
-
-        glm::vec3 dir = glm::rotate(directionVector, glm::radians(30.0f), left);
-        glm::vec3 eye = this->spaceShipPosition - dir * 8.0f;
-        */
         glm::vec3 eye = glm::vec3(1.0, 1.0, 1.0);
         glm::vec3 up = glm::vec3(0.0, 1.0, 0.0);
-        glm::vec3 position = glm::vec3(1.0, 1.0, 1.0);
-        glm::mat4 view = glm::lookAt(eye, position, up);
+        glm::mat4 view = glm::lookAt(eye, cameraPosition, up);
 
         // draw cube
         glm::mat4 cubeModel = glm::mat4(1.0f);
